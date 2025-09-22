@@ -5,7 +5,10 @@ public class PlayerControls : MonoBehaviour
 {
     public Rigidbody2D rb;
     public float moveSpeed = 5f;
+    public float jumpSpeed = 12f;
     float horizontalMovement;
+
+
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
@@ -20,5 +23,13 @@ public class PlayerControls : MonoBehaviour
     public void Move(InputAction.CallbackContext context)
     {
         horizontalMovement = context.ReadValue<Vector2>().x;
+    }
+    
+    public void Jump(InputAction.CallbackContext context)
+    {
+        if (context.performed)
+        {
+            rb.linearVelocity = new Vector2(rb.linearVelocity.x, jumpSpeed);
+        }
     }
 }
