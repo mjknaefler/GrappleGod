@@ -2,19 +2,19 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!78 &1
 TagManager:
-  serializedVersion: 2
+  serializedVersion: 3
   tags: []
   layers:
   - Default
   - TransparentFX
   - Ignore Raycast
-  - 
+  - Ground
   - Water
   - UI
-  - 
-  - 
-  - 
-  - 
+  - Player
+  - Enemy
+  - Hitbox
+  - EnemyProjectile
   - 
   - 
   - 
@@ -38,6 +38,26 @@ TagManager:
   - 
   - 
   m_SortingLayers:
+  - name: Background
+    uniqueID: 2147037237
+    locked: 0
+  - name: New Layer 5
+    uniqueID: 2559594891
+    locked: 0
+  - name: 
+    uniqueID: 1055428209
+    locked: 0
+  - name: New Layer 3
+    uniqueID: 2661498499
+    locked: 0
+  - name: New Layer 4
+    uniqueID: 146705081
+    locked: 0
   - name: Default
     uniqueID: 0
     locked: 0
+  - name: Ground
+    uniqueID: 2166248261
+    locked: 0
+  m_RenderingLayers:
+  - Default
