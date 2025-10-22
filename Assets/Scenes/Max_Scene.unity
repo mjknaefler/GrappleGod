@@ -273,13 +273,33 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 4085193884261435430, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: -11.594
+      objectReference: {fileID: 0}
+    - target: {fileID: 4630027631967302273, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.36
+      objectReference: {fileID: 0}
+    - target: {fileID: 4630027631967302273, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 4630027631967302273, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 4.99
+      objectReference: {fileID: 0}
+    - target: {fileID: 4630027631967302273, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 5.02
+      objectReference: {fileID: 0}
     - target: {fileID: 5022134946897821536, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
       propertyPath: m_Name
       value: CinemachineCamera
       objectReference: {fileID: 0}
     - target: {fileID: 6306335558656456297, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -5.2723002
+      value: -3.5364027
       objectReference: {fileID: 0}
     - target: {fileID: 6306335558656456297, guid: d21f4a328f1884aa198b713b52753ae7, type: 3}
       propertyPath: m_LocalPosition.y
@@ -490,7 +510,7 @@ Transform:
   m_GameObject: {fileID: 2060511054}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: -5.2723002, y: -4.4099994, z: -10}
+  m_LocalPosition: {x: -3.5364027, y: -4.4099994, z: -10}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
