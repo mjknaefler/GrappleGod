@@ -17,13 +17,16 @@ public class Movement : MonoBehaviour
     [SerializeField] private LayerMask groundMask;
 
     [Header("Fall Tuning")]
-    [SerializeField] private float fallMultiplier = 2.0f;    // faster fall
-    [SerializeField] private float lowJumpMultiplier = 2.5f; // short hop if jump released
-    [SerializeField] private float maxFallSpeed = -20f;      // terminal velocity (negative)
+    [SerializeField] private float fallMultiplier = 2.0f;
+    [SerializeField] private float lowJumpMultiplier = 2.5f;
+    [SerializeField] private float maxFallSpeed = -20f;
 
     [Header("Input (new Input System)")]
     [SerializeField] private InputActionReference moveAction;
     [SerializeField] private InputActionReference jumpAction;
+
+    [Header("Facing")]
+    [SerializeField] private bool flipByMovement = false;
 
     private Rigidbody2D rb;
     private Animator anim;
@@ -42,19 +45,16 @@ public class Movement : MonoBehaviour
         anim = GetComponent<Animator>();
         playerInput = GetComponent<PlayerInput>();
         sr = GetComponent<SpriteRenderer>();
-
         rb.freezeRotation = true;
     }
 
     private void OnEnable()
     {
-        // Resolve Move
         if (moveAction != null && moveAction.action != null)
             _move = moveAction.action;
         else if (playerInput != null && playerInput.actions != null)
             _move = playerInput.actions["Move"];
 
-        // Resolve Jump
         if (jumpAction != null && jumpAction.action != null)
             _jump = jumpAction.action;
         else if (playerInput != null && playerInput.actions != null)
@@ -64,14 +64,14 @@ public class Movement : MonoBehaviour
         {
             _move.Enable();
             _move.performed += OnMovePerformed;
-            _move.canceled  += OnMoveCanceled;
+            _move.canceled += OnMoveCanceled;
         }
 
         if (_jump != null)
         {
             _jump.Enable();
             _jump.performed += OnJumpPerformed;
-            _jump.canceled  += OnJumpCanceled; // for short-hop
+            _jump.canceled += OnJumpCanceled;
         }
     }
 
@@ -80,14 +80,14 @@ public class Movement : MonoBehaviour
         if (_move != null)
         {
             _move.performed -= OnMovePerformed;
-            _move.canceled  -= OnMoveCanceled;
+            _move.canceled -= OnMoveCanceled;
             _move.Disable();
         }
 
         if (_jump != null)
         {
             _jump.performed -= OnJumpPerformed;
-            _jump.canceled  -= OnJumpCanceled; // make sure we unsubscribe
+            _jump.canceled -= OnJumpCanceled;
             _jump.Disable();
         }
     }
@@ -107,69 +107,50 @@ public class Movement : MonoBehaviour
 
     private void OnJumpPerformed(InputAction.CallbackContext ctx)
     {
-        // Only jump if grounded
         if (!isGrounded) return;
-
-        // Set upward velocity
-        var v = rb.linearVelocity; // if needed, replace with rb.velocity
+        var v = rb.linearVelocity;
         v.y = jumpForce;
         rb.linearVelocity = v;
-
-        // Animator (optional)
         anim.SetTrigger("Jump");
     }
 
     private void OnJumpCanceled(InputAction.CallbackContext ctx)
     {
-        // Let Update keep jumpHeld live; this is just a safety clear
         jumpHeld = false;
     }
 
     private void FixedUpdate()
     {
-        // Horizontal move
         Vector2 normalizedInput = moveInput.normalized;
         rb.linearVelocity = new Vector2(normalizedInput.x * moveSpeed, rb.linearVelocity.y);
 
-        // Ground check
         if (groundCheck != null)
             isGrounded = Physics2D.OverlapCircle(groundCheck.position, groundCheckRadius, groundMask);
 
-        // Better jump feel / fall tuning
-        Vector2 v = rb.linearVelocity; // or rb.velocity
+        Vector2 v = rb.linearVelocity;
         if (v.y < -0.01f)
-        {
-            // Faster fall
             v.y += Physics2D.gravity.y * (fallMultiplier - 1f) * Time.fixedDeltaTime;
-        }
         else if (v.y > 0.01f && !jumpHeld)
-        {
-            // Short hop when jump is released early
             v.y += Physics2D.gravity.y * (lowJumpMultiplier - 1f) * Time.fixedDeltaTime;
-        }
 
-        // Clamp terminal velocity
         if (v.y < maxFallSpeed) v.y = maxFallSpeed;
-
         rb.linearVelocity = v;
     }
 
     private void Update()
     {
-        // Keep a live "jump held" read (works even if canceled missfires)
         jumpHeld = _jump != null && _jump.IsPressed();
 
-        // Animator parameters
         anim.SetFloat("Speed", Mathf.Abs(rb.linearVelocity.x));
         anim.SetBool("IsGrounded", isGrounded);
-        anim.SetFloat("YVel", rb.linearVelocity.y);              // optional
-        anim.SetBool("IsFalling", rb.linearVelocity.y < -0.1f && !isGrounded); // optional
+        anim.SetFloat("YVel", rb.linearVelocity.y);
+        anim.SetBool("IsFalling", rb.linearVelocity.y < -0.1f && !isGrounded);
 
-        // Flip sprite to face movement
-        if (rb.linearVelocity.x > 0.1f)
-            sr.flipX = false;
-        else if (rb.linearVelocity.x < -0.1f)
-            sr.flipX = true;
+        if (flipByMovement)
+        {
+            if (rb.linearVelocity.x > 0.1f) sr.flipX = false;
+            else if (rb.linearVelocity.x < -0.1f) sr.flipX = true;
+        }
     }
 
     private void OnDrawGizmosSelected()
