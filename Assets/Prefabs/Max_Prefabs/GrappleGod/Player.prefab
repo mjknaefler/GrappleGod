@@ -79,7 +79,8 @@ GameObject:
   - component: {fileID: 6273565865635344900}
   - component: {fileID: 8017332919339775621}
   - component: {fileID: 2989247727896990209}
-  - component: {fileID: 8325394436655644683}
+  - component: {fileID: 7535898531217542847}
+  - component: {fileID: 3084590442008225111}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -311,6 +312,7 @@ MonoBehaviour:
   maxFallSpeed: -20
   moveAction: {fileID: 8446866733332505840, guid: 41266f43ede6fd814ba03f2ed057a389, type: 3}
   jumpAction: {fileID: 685426074737737839, guid: 41266f43ede6fd814ba03f2ed057a389, type: 3}
+  flipByMovement: 0
 --- !u!114 &8017332919339775621
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -339,7 +341,7 @@ MonoBehaviour:
   health: {fileID: 8017332919339775621}
   damageAmount: 1
   healAmount: 1
---- !u!114 &8325394436655644683
+--- !u!114 &7535898531217542847
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -348,9 +350,24 @@ MonoBehaviour:
   m_GameObject: {fileID: 5941516454500995240}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: c5aae4fae26bdc24186e24028d946b3d, type: 3}
+  m_Script: {fileID: 11500000, guid: 71cd546bedff2b84c8a16fc5eac785ed, type: 3}
   m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::PlayerAttack
+  m_EditorClassIdentifier: '::'
   attackCooldown: 0.5
-  projectilePrefab: {fileID: 7259374370334305698, guid: 6874799162c5e43ad8b8d2f5d917f42f, type: 3}
-  firePoint: {fileID: 3562992186217151344}
+  projectilePrefab: {fileID: 7259374370334305698, guid: 020c489131123b34b98634e35920b1f9, type: 3}
+  firePoint: {fileID: 0}
+  firePointRadius: 0.75
+  rotateProjectileToAim: 1
+  visualRoot: {fileID: 0}
+--- !u!114 &3084590442008225111
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5941516454500995240}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b929fb2860b037f4dab631c6e1ef6c5c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::PlayerRespawn
