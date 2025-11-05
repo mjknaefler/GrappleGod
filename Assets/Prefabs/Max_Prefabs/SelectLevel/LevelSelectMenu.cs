@@ -5,7 +5,7 @@ public class LevelSelectMenu : MonoBehaviour
 {
     public void Level1()
     {
-        SceneManager.LoadSceneAsync(3);
+        SceneManager.LoadSceneAsync(2);
     }
     public void Boss1()
     {
