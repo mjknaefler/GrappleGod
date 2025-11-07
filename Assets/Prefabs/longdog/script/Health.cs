@@ -3,11 +3,13 @@ using System; // Make sure this is here for 'Action'
 
 public class Health : MonoBehaviour
 {
-    // Your 'maxHP' field is here
+    // The maximum health value, configurable in the Inspector.
+    [Tooltip("The starting and maximum health of the entity.")]
     [SerializeField] private int maxHP;
 
-    // This lets other scripts (like your UI) read the current health,
-    // but not set it. This is why it's not in the Inspector.
+    // This value displays the entity's current health in the Inspector, 
+    // but it is only settable by methods within this script.
+    [field: SerializeField]
     public int Current { get; private set; }
 
     public event Action<int, int> OnHealthChanged;
@@ -27,8 +29,6 @@ public class Health : MonoBehaviour
         OnDeath -= Die;
     }
 
-    // --- FIX WAS HERE ---
-    // Removed the stray '_' and added the opening curly brace '{'
     public void Damage(int amount)
     {
         if (amount < 0) return; // Don't take negative damage
