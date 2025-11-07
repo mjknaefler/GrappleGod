@@ -16,13 +16,7 @@ public class SimpleProjectileDamage : MonoBehaviour
         if (((1 << other.gameObject.layer) & playerLayer) == 0)
             return;
 
-        Health health = other.GetComponent<Health>();
-        if (health != null)
-        {
-            health.Damage((int)damage);
-            Debug.Log($"Projectile dealt {damage} damage to {other.name}");
-        }
-        
+        other.SendMessage("ApplyDamage", damage, SendMessageOptions.DontRequireReceiver);
         Destroy(gameObject);
     }
 }
