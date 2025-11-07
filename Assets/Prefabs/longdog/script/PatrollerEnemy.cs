@@ -3,10 +3,14 @@ using UnityEngine;
 public class EnemyPatrol2D : MonoBehaviour
 {
     [Header("Patrol Settings")]
+    [Tooltip("How fast the enemy moves horizontally.")]
     public float speed = 2f;
+    [Tooltip("The starting waypoint (Transform).")]
     public Transform pointStart;
+    [Tooltip("The ending waypoint (Transform).")]
     public Transform pointEnd;
-    public float stopDistance = 0.5f; // Distance to consider a point reached
+    [Tooltip("Horizontal distance to the point required to trigger a turn.")]
+    public float stopDistance = 0.5f; 
 
     [Header("Components")]
     private Rigidbody2D rb;
@@ -16,34 +20,62 @@ public class EnemyPatrol2D : MonoBehaviour
     void Awake()
     {
         rb = GetComponent<Rigidbody2D>();
-        // Start by moving towards the end point
-        currentTarget = pointEnd;
+        if (rb != null)
+        {
+             rb.freezeRotation = true; // Prevents unwanted rotation
+        }
+
+        // Determine which point is further away initially and set it as the target
+        float distA = Vector2.Distance(transform.position, pointStart.position);
+        float distB = Vector2.Distance(transform.position, pointEnd.position);
+        
+        currentTarget = (distA > distB) ? pointStart : pointEnd;
     }
 
     // Called once per frame
-    void Update()
+    void FixedUpdate()
     {
-        // 1. Calculate the direction to the target
+        if (currentTarget == null) return;
+
+        // 1. Calculate the direction vector to the target
+        // We only care about the X component for direction calculation
         Vector2 direction = (currentTarget.position - transform.position).normalized;
+        
+        // 2. Apply movement velocity
+        // We ensure movement is only horizontal by forcing the Y component of velocity
+        // to be governed by external forces (like gravity or internal enemy behavior)
+        rb.linearVelocity = new Vector2(direction.x * speed, rb.linearVelocity.y);
 
-        // 2. Move the enemy using Rigidbody2D
-        rb.linearVelocity = direction * speed;
+        // 3. Check for Turn Condition (X-axis only)
+        // This is the CRITICAL FIX for airborne patrolling: we ignore the Y-axis position.
+        
+        float targetX = currentTarget.position.x;
+        float currentX = transform.position.x;
+        
+        // Calculate the absolute horizontal distance
+        float horizontalDistance = Mathf.Abs(targetX - currentX);
+        
+        // Determine the horizontal direction of movement
+        float movementDirection = Mathf.Sign(rb.linearVelocity.x);
 
-        // 3. Check if the enemy has reached the current target
-        if (Vector2.Distance(transform.position, currentTarget.position) < stopDistance)
+        if (horizontalDistance <= stopDistance)
         {
-            // Switch the target to the other point
-            if (currentTarget == pointEnd)
+            // Check if we are moving towards the current target's X position
+            if (Mathf.Sign(targetX - currentX) != movementDirection || horizontalDistance < 0.05f)
             {
-                currentTarget = pointStart;
+                // Switch the target
+                if (currentTarget == pointEnd)
+                {
+                    currentTarget = pointStart;
+                }
+                else
+                {
+                    currentTarget = pointEnd;
+                }
+                
+                // Flip the sprite when changing direction
+                Flip();
             }
-            else
-            {
-                currentTarget = pointEnd;
-            }
-            
-            // Optional: Flip the sprite when changing direction
-            Flip();
         }
     }
     

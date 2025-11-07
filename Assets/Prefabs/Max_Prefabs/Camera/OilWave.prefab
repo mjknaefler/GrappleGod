@@ -10,7 +10,6 @@ GameObject:
   m_Component:
   - component: {fileID: 2640742603043871381}
   - component: {fileID: 3421920742334034861}
-  - component: {fileID: 7021946007738270044}
   m_Layer: 0
   m_Name: OilWave
   m_TagString: Untagged
@@ -91,26 +90,3 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &7021946007738270044
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 3035148470205159952}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 40889f4ffc5081545afa402a26522b8c, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::CameraBottomOilFlipbook
-  yOffset: 0.05
-  widthPadding: 1.2
-  screenHeightPercent: 0.11
-  bottomBleed: 0.05
-  widthBleed: 0
-  frames:
-  - {fileID: -9106573014738691776, guid: 0d214aa750ff6df4d90a13220d77bf0e, type: 3}
-  - {fileID: -639548000, guid: 0d214aa750ff6df4d90a13220d77bf0e, type: 3}
-  - {fileID: -1364432776, guid: 0d214aa750ff6df4d90a13220d77bf0e, type: 3}
-  - {fileID: -1894887506, guid: 0d214aa750ff6df4d90a13220d77bf0e, type: 3}
-  fps: 4

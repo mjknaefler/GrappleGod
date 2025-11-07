@@ -4,11 +4,11 @@ public class GrappleTargetManager : MonoBehaviour
 {
     [Header("Player & Camera")]
     public Transform player;   // assign in Inspector (or tag Player)
-    public Camera cam;         // assign Main Camera (or leave blank)
+    public Camera cam;         // a ssign Main Camera (or leave blank)
 
     [Header("Selection Rules")]
     public float forwardBufferX = 1.5f;   // must be this far ahead on X
-    public float maxSelectDist = 10f;     // max distance from player
+    public float maxSelectDist = 1f;      // max distance from player
     public float minVerticalAbove = 0.5f; // must be above player by this much
     public bool requireTopHalf = true;    // only show in top half of screen
 
@@ -30,7 +30,7 @@ public class GrappleTargetManager : MonoBehaviour
         if (!player) return;
 
         GrappleTarget best = null;
-        float bestDx = float.PositiveInfinity;
+        float bestDistSqr = float.PositiveInfinity;
         float maxDistSqr = maxSelectDist * maxSelectDist;
 
         foreach (var t in GrappleTarget.All)
@@ -38,11 +38,11 @@ public class GrappleTargetManager : MonoBehaviour
             if (!t) continue;
 
             Vector3 tp = t.transform.position;
-            float dx = tp.x - player.position.x;
-
-            if (dx < forwardBufferX) continue; // must be ahead
+            
             if (tp.y < player.position.y + Mathf.Max(minVerticalAbove, t.verticalBiasMin)) continue;
-            if ((tp - player.position).sqrMagnitude > maxDistSqr) continue;
+            
+            float distSqr = (tp - player.position).sqrMagnitude;
+            if (distSqr > maxDistSqr) continue;
 
             if (requireTopHalf && cam)
             {
@@ -51,7 +51,7 @@ public class GrappleTargetManager : MonoBehaviour
                 if (!inTop) continue;
             }
 
-            if (dx < bestDx) { bestDx = dx; best = t; }
+            if (distSqr < bestDistSqr) { bestDistSqr = distSqr; best = t; }
         }
 
         current = best;
