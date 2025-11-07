@@ -7,11 +7,16 @@ public class Health : MonoBehaviour
     [Tooltip("The starting and maximum health of the entity.")]
     [SerializeField] private int maxHP;
 
+    // CRITICAL FIX: Public read-only property to expose max health to other scripts (like HealthUI).
+    public int MaxHP => maxHP; 
+
     // This value displays the entity's current health in the Inspector, 
     // but it is only settable by methods within this script.
     [field: SerializeField]
     public int Current { get; private set; }
 
+    // Event that notifies subscribers (like HealthUI) when health changes.
+    // The parameters are (currentHealth, maxHealth)
     public event Action<int, int> OnHealthChanged;
     public event Action OnDeath;
 
@@ -31,7 +36,7 @@ public class Health : MonoBehaviour
 
     public void Damage(int amount)
     {
-        if (amount < 0) return; // Don't take negative damage
+        if (amount < 0) return;
 
         Current -= amount;
         
@@ -42,7 +47,7 @@ public class Health : MonoBehaviour
             OnDeath?.Invoke();
         }
 
-        // Fire the health changed event
+        // Fire the health changed event, triggering the HealthUI update
         OnHealthChanged?.Invoke(Current, maxHP);
     }
 
