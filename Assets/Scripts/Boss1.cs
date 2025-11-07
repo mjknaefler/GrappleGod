@@ -96,43 +96,51 @@ public class Boss1 : MonoBehaviour
         Vector2 toPlayer = (Vector2)(target.position - transform.position);
         float   dist     = toPlayer.magnitude;
 
-        // choose attack based on range & cooldowns (alternating pattern)
+        // ---- ATTACK SELECTION (alternating) ----
         if (nextAttack == 1 && dist <= atk1Range && cd1 <= 0f)
         {
             StartCoroutine(DoAttack1());
-            nextAttack = 2;   // next time, try attack 2
+            nextAttack = 2;
         }
         else if (nextAttack == 2 && dist >= atk2MinRange && dist <= atk2MaxRange && cd2 <= 0f)
         {
             StartCoroutine(DoAttack2());
-            nextAttack = 1;   // next time, try attack 1
+            nextAttack = 1;
         }
 
-        // ----- flying hover/orbit movement (no gravity) -----
+        // ---- MOVEMENT: slow approach -> hover/orbit -> back off ----
+        // Small band around preferred radius to reduce jitter
+        const float band = 0.6f;
+
         Vector2 desiredVel = Vector2.zero;
 
-        if (dist < innerKeepOut)
+        if (dist > preferredRadius + band)
         {
-            // too close -> back off
-            desiredVel = (-toPlayer).normalized * retreatSpeed;
+            // APPROACH SLOWLY: ramp speed with distance but cap it low
+            // tweak approachSpeed in inspector; this further soft-limits it
+            float ramp = Mathf.Clamp01((dist - (preferredRadius + band)) / (outerLeash - preferredRadius));
+            float slowCap = Mathf.Min(approachSpeed, 3.5f); // gentle top speed while approaching
+            desiredVel = toPlayer.normalized * Mathf.Lerp(1.0f, slowCap, ramp);
         }
-        else if (dist > outerLeash)
+        else if (dist < innerKeepOut)
         {
-            // too far -> move in
-            desiredVel = toPlayer.normalized * approachSpeed;
+            // TOO CLOSE: back off a bit faster so it creates space
+            desiredVel = (-toPlayer).normalized * retreatSpeed;
         }
         else
         {
-            // within band -> orbit with gentle radial correction toward preferredRadius
-            Vector2 tangent = new Vector2(-toPlayer.y, toPlayer.x).normalized * Mathf.Sign(orbitDir); // perpendicular
+            // IN THE BAND: orbit with mild radial correction so it doesn't drift
+            Vector2 tangent = new Vector2(-toPlayer.y, toPlayer.x).normalized * Mathf.Sign(orbitDir);
             float radialErr = dist - preferredRadius;
             Vector2 radial  = (-Mathf.Sign(radialErr) * toPlayer.normalized)
-                              * Mathf.Clamp01(Mathf.Abs(radialErr) / 2f) * 0.6f * maxSpeed;
+                            * Mathf.Clamp01(Mathf.Abs(radialErr) / 1.5f) * 0.4f * maxSpeed;
 
-            desiredVel = tangent * orbitSpeed + radial;
+            // reduce orbit speed a bit so it doesn't feel like it's “running away”
+            float softOrbit = Mathf.Min(orbitSpeed, 2.5f);
+            desiredVel = tangent * softOrbit + radial;
         }
 
-        // smooth steer toward desired velocity and clamp top speed
+        // Smooth steer toward desired velocity and clamp max speed
         Vector2 v = Vector2.MoveTowards(rb ? rb.linearVelocity : Vector2.zero, desiredVel, accel * Time.deltaTime);
         if (v.magnitude > maxSpeed) v = v.normalized * maxSpeed;
         if (rb) rb.linearVelocity = v;
@@ -141,6 +149,7 @@ public class Boss1 : MonoBehaviour
         if (animator && rb && rb.linearVelocity.sqrMagnitude < 0.01f)
             CrossfadeSafe(idleState);
     }
+
 
     IEnumerator DoAttack1()
     {
