@@ -14,10 +14,9 @@ public class Boss1 : MonoBehaviour
     [SerializeField] float accel           = 20.0f;
     [SerializeField] int   orbitDir        = 1;    // 1 = clockwise, -1 = counter
 
-
     [Header("Refs")]
     [SerializeField] Animator animator;                 // assign the boss animator
-    [SerializeField] Rigidbody2D rb;                    // optional but nice for simple movement
+    [SerializeField] Rigidbody2D rb;                    // movement body
     [SerializeField] Transform target;                  // auto-finds Player if left empty
     [SerializeField] LayerMask playerLayer;
     [SerializeField] Transform hitOrigin;               // empty child in front of boss
@@ -25,13 +24,12 @@ public class Boss1 : MonoBehaviour
     [SerializeField] GameObject projectilePrefab;       // optional (for Attack 2)
 
     [Header("Animator State Names (must match Animator)")]
-    // Defaulted to your file/state names. If your Animator state names differ, set them in the Inspector.
     [SerializeField] string idleState   = "Wooden Aarakocra Idle Animation";
     [SerializeField] string atk1State   = "Wooden Aarakocra Attack 1Animation";
     [SerializeField] string atk2State   = "Wooden Aarakocra Attack 2 Animation";
 
     [Header("Behavior")]
-    [SerializeField] float chaseSpeed = 2.0f;
+    [SerializeField] float chaseSpeed = 2.0f;           // (not used for flight, kept if you toggle modes)
     [SerializeField] float stopDistance = 1.25f;
     [SerializeField] float stateCrossfade = 0.05f;
 
@@ -64,6 +62,18 @@ public class Boss1 : MonoBehaviour
             var p = GameObject.FindGameObjectWithTag("Player");
             if (p) target = p.transform;
         }
+
+        // Keep the flyer from spinning and make hover smoother
+        if (rb)
+        {
+            rb.gravityScale  = 0f;
+            rb.linearDamping          = 4f;   // linear drag for smooth hover
+            rb.angularDamping   = 0f;
+            rb.constraints   = RigidbodyConstraints2D.FreezeRotation;
+        }
+
+        // Ensure animations don't rotate/translate the root
+        if (animator) animator.applyRootMotion = false;
     }
 
     void Update()
@@ -77,23 +87,16 @@ public class Boss1 : MonoBehaviour
         s.x = Mathf.Abs(s.x) * (target.position.x >= transform.position.x ? 1 : -1);
         transform.localScale = s;
 
-        if (busy) { if (rb) rb.linearVelocity = Vector2.zero; return; }
+        // hard-lock orientation every frame (prevents random spinning)
+        transform.rotation = Quaternion.identity;
+        if (rb) rb.angularVelocity = 0f;
 
-        // ----- spacing/orbit config (tweak to taste) -----
-        const float preferredRadius = 4.0f; // desired hover distance
-        const float innerKeepOut    = 2.0f; // back off if inside this
-        const float outerLeash      = 9.0f; // move in if outside this
-        const float orbitSpeed      = 3.0f; // tangential speed around player
-        const float approachSpeed   = 5.0f; // speed when moving in
-        const float retreatSpeed    = 7.0f; // speed when backing off
-        const float maxSpeed        = 7.0f; // cap
-        const float accel           = 20.0f; // steering acceleration
-        const int   orbitDir        = 1;     // 1 = clockwise, -1 = counter
+        if (busy) { if (rb) rb.linearVelocity = Vector2.zero; return; }
 
         Vector2 toPlayer = (Vector2)(target.position - transform.position);
         float   dist     = toPlayer.magnitude;
 
-        // choose attack based on range & cooldowns
+        // choose attack based on range & cooldowns (alternating pattern)
         if (nextAttack == 1 && dist <= atk1Range && cd1 <= 0f)
         {
             StartCoroutine(DoAttack1());
@@ -121,10 +124,10 @@ public class Boss1 : MonoBehaviour
         else
         {
             // within band -> orbit with gentle radial correction toward preferredRadius
-            Vector2 tangent = new Vector2(-toPlayer.y, toPlayer.x).normalized * orbitDir; // perpendicular to player vector
+            Vector2 tangent = new Vector2(-toPlayer.y, toPlayer.x).normalized * Mathf.Sign(orbitDir); // perpendicular
             float radialErr = dist - preferredRadius;
             Vector2 radial  = (-Mathf.Sign(radialErr) * toPlayer.normalized)
-                            * Mathf.Clamp01(Mathf.Abs(radialErr) / 2f) * 0.6f * maxSpeed;
+                              * Mathf.Clamp01(Mathf.Abs(radialErr) / 2f) * 0.6f * maxSpeed;
 
             desiredVel = tangent * orbitSpeed + radial;
         }
@@ -138,7 +141,6 @@ public class Boss1 : MonoBehaviour
         if (animator && rb && rb.linearVelocity.sqrMagnitude < 0.01f)
             CrossfadeSafe(idleState);
     }
-
 
     IEnumerator DoAttack1()
     {
