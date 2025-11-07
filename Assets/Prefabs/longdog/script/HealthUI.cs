@@ -5,11 +5,16 @@ using System.Collections.Generic;
 public class HealthUI : MonoBehaviour
 {
     [Header("References")]
-    [SerializeField] private Health health;               // Drag your Player's Health here
-    [SerializeField] private List<Image> hearts;          // Drag your heart Images here
+    [Tooltip("Drag your Player's Health script here.")]
+    [SerializeField] private Health health;               
+    [Tooltip("Drag your heart Image UI elements into this list.")]
+    [SerializeField] private List<Image> hearts;          
 
     [Header("Sprites")]
-    [SerializeField] private Sprite fullHeart;            // Assign your full heart PNG
+    [Tooltip("Assign your full heart sprite (e.g., a colored heart).")]
+    [SerializeField] private Sprite fullHeart;            
+    [Tooltip("Assign your empty heart sprite (e.g., a greyed-out outline).")]
+    [SerializeField] private Sprite emptyHeart;           
 
     private bool _subscribed;
 
@@ -19,7 +24,7 @@ public class HealthUI : MonoBehaviour
         if (!ValidateSprites()) return;
         if (!ValidateHearts()) return;
 
-        // Ensure each Image has the fullHeart sprite at startup
+        // Set initial heart sprite properties
         foreach (var img in hearts)
         {
             img.type = Image.Type.Simple;
@@ -30,16 +35,27 @@ public class HealthUI : MonoBehaviour
 
     private void OnEnable()
     {
+        // Attempt to find the Health component if it wasn't manually assigned.
+        // We prioritize the manual assignment, then search up the parent chain, then search globally.
         if (health == null)
         {
             health = GetComponentInParent<Health>() ?? FindAnyObjectByType<Health>();
         }
         
+        // CHECK: If we have a Health script AND we haven't subscribed yet.
         if (health != null && !_subscribed)
         {
             health.OnHealthChanged += UpdateHearts;
             health.OnDeath += HandleDeath;
             _subscribed = true;
+            
+            // DIAGNOSTIC LOG: Confirm success
+            Debug.Log($"[HealthUI] Successfully subscribed to {health.gameObject.name}'s Health events.");
+        }
+        else if (health == null)
+        {
+            // CRITICAL ERROR: This is the most likely reason for failure if the log doesn't show success.
+            Debug.LogError("[HealthUI] CRITICAL: Could not find Health component to subscribe to. Drag the player's Health script into the Inspector slot.");
         }
     }
 
@@ -47,12 +63,26 @@ public class HealthUI : MonoBehaviour
     {
         if (!ValidateSprites() || !ValidateHearts() || health == null) return;
 
-        // Initialize display to current health
-        UpdateHearts(Mathf.Clamp(health.Current, 0, hearts.Count), hearts.Count);
+        // Ensure the subscription was successful before proceeding
+        if (!_subscribed)
+        {
+             Debug.LogError("[HealthUI] Start() failed because event subscription failed in OnEnable. Check console for OnEnable error.");
+             return;
+        }
+
+        // Check if the number of UI hearts matches the player's max health.
+        if (hearts.Count != health.MaxHP) 
+        {
+            Debug.LogWarning($"[HealthUI] Heart count ({hearts.Count}) does not match max HP ({health.MaxHP}). UI will only display up to {hearts.Count} HP.");
+        }
+
+        // CRITICAL STEP: Initialize display to current health. This forces the UI to sync immediately.
+        UpdateHearts(health.Current, health.MaxHP);
     }
 
     private void OnDisable()
     {
+        // Unsubscribe from events to prevent memory leaks/errors
         if (_subscribed && health != null)
         {
             health.OnHealthChanged -= UpdateHearts;
@@ -61,12 +91,17 @@ public class HealthUI : MonoBehaviour
         }
     }
 
+    // --- Validation Methods (omitted for brevity) ---
     private bool ValidateSprites()
     {
         if (fullHeart == null)
         {
             Debug.LogError("[HealthUI] Assign fullHeart sprite in the Inspector.");
             return false;
+        }
+        if (emptyHeart == null)
+        {
+            Debug.LogWarning("[HealthUI] emptyHeart sprite not assigned. Falling back to fading the full heart sprite.");
         }
         return true;
     }
@@ -89,26 +124,43 @@ public class HealthUI : MonoBehaviour
         return true;
     }
     
-    // --- THIS METHOD IS FIXED ---
+    // --- The Heart Update Logic ---
     private void UpdateHearts(int current, int max)
     {
+        // Loop through all the UI Image elements you have assigned
         for (int i = 0; i < hearts.Count; i++)
         {
+            // If the current health (1, 2, 3...) is greater than the index (0, 1, 2...), the heart is full.
             if (i < current)
             {
-                // This is a "full" heart. Make it fully visible (white, full alpha).
-                hearts[i].color = new Color(1f, 1f, 1f, 1f); 
+                // Heart is FULL: Use the full sprite and make it visible.
+                hearts[i].sprite = fullHeart;
+                hearts[i].color = Color.white; 
             }
             else
             {
-                // This is an "empty" heart. Make it fully invisible (zero alpha).
-                hearts[i].color = new Color(1f, 1f, 1f, 0f);
+                // Heart is EMPTY
+                if (emptyHeart != null)
+                {
+                    // If you assigned an empty heart sprite, use it.
+                    hearts[i].sprite = emptyHeart;
+                    hearts[i].color = Color.white;
+                }
+                else
+                {
+                    // Fallback: Keep the full sprite but fade it out
+                    hearts[i].color = new Color(1f, 1f, 1f, 0.2f); // Fades to a dim, almost transparent white
+                }
             }
         }
+        // Diagnostic log: Confirms the update successfully ran
+        Debug.Log($"HealthUI updated: Current HP is {current}/{max}");
     }
 
     private void HandleDeath()
     {
-        Debug.Log("Player died!");
+        Debug.Log("Player died! You can add UI effects here.");
+        // Optional: Hide all hearts on death
+        UpdateHearts(0, hearts.Count);
     }
 }
