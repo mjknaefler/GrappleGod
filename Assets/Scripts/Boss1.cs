@@ -97,15 +97,13 @@ public class Boss1 : MonoBehaviour
         float   dist     = toPlayer.magnitude;
 
         // choose attack based on range & cooldowns (alternating pattern)
-        if (nextAttack == 1 && dist <= atk1Range && cd1 <= 0f && !busy)
+        if (nextAttack == 1 && dist <= atk1Range && cd1 <= 0f)
         {
-            cd1 = atk1Cooldown; // Set cooldown IMMEDIATELY to prevent spam
             StartCoroutine(DoAttack1());
             nextAttack = 2;   // next time, try attack 2
         }
-        else if (nextAttack == 2 && dist >= atk2MinRange && dist <= atk2MaxRange && cd2 <= 0f && !busy)
+        else if (nextAttack == 2 && dist >= atk2MinRange && dist <= atk2MaxRange && cd2 <= 0f)
         {
-            cd2 = atk2Cooldown; // Set cooldown IMMEDIATELY to prevent spam
             StartCoroutine(DoAttack2());
             nextAttack = 1;   // next time, try attack 1
         }
@@ -147,15 +145,10 @@ public class Boss1 : MonoBehaviour
     IEnumerator DoAttack1()
     {
         busy = true; if (rb) rb.linearVelocity = Vector2.zero;
-        
-        // Capture the facing direction NOW (before the telegraph delay)
-        float attackDir = Mathf.Sign(transform.localScale.x);
-        
         CrossfadeSafe(atk1State);
         yield return new WaitForSeconds(atk1Telegraph);
-        
-        // Pass the captured direction to the attack
-        PerformAttack1(attackDir);
+        PerformAttack1();
+        cd1 = atk1Cooldown;
         yield return new WaitForSeconds(0.15f);
         busy = false;
     }
@@ -166,37 +159,20 @@ public class Boss1 : MonoBehaviour
         CrossfadeSafe(atk2State);
         yield return new WaitForSeconds(atk2Telegraph);
         PerformAttack2();
+        cd2 = atk2Cooldown;
         yield return new WaitForSeconds(0.15f);
         busy = false;
     }
 
     // Melee hit
-    public void PerformAttack1(float attackDirection)
+    public void PerformAttack1()
     {
-        Vector2 center;
-        
-        if (hitOrigin)
-        {
-            // If hitOrigin exists, it's a child transform that already flips with the boss
-            // So just use its position directly without adding offset again
-            center = hitOrigin.position;
-        }
-        else
-        {
-            // Fallback: use boss position + offset adjusted for the CAPTURED attack direction
-            center = (Vector2)transform.position + new Vector2(atk1BoxOffset.x * attackDirection, atk1BoxOffset.y);
-        }
+        Vector2 origin = (hitOrigin ? (Vector2)hitOrigin.position : (Vector2)transform.position);
+        float dir = Mathf.Sign(transform.localScale.x);
+        Vector2 center = origin + new Vector2(atk1BoxOffset.x * dir, atk1BoxOffset.y);
 
         Collider2D hit = Physics2D.OverlapBox(center, atk1BoxSize, 0f, playerLayer);
-        if (hit)
-        {
-            Health health = hit.GetComponent<Health>();
-            if (health != null)
-            {
-                health.Damage((int)atk1Damage);
-                Debug.Log($"Boss dealt {atk1Damage} damage to {hit.name} (attack dir: {attackDirection})");
-            }
-        }
+        if (hit) hit.SendMessage("ApplyDamage", atk1Damage, SendMessageOptions.DontRequireReceiver);
     }
 
     // Projectile (if prefab set) else melee fallback using same box
@@ -218,9 +194,8 @@ public class Boss1 : MonoBehaviour
         }
         else
         {
-            // fallback: reuse melee box with current facing direction
-            float attackDir = Mathf.Sign(transform.localScale.x);
-            PerformAttack1(attackDir);
+            // fallback: reuse melee box
+            PerformAttack1();
         }
     }
 
@@ -234,18 +209,9 @@ public class Boss1 : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         Gizmos.color = Color.red;
-        Vector2 center;
-        
-        if (hitOrigin)
-        {
-            center = hitOrigin.position;
-        }
-        else
-        {
-            float dir = Mathf.Sign(transform.localScale.x);
-            center = (Vector2)transform.position + new Vector2(atk1BoxOffset.x * dir, atk1BoxOffset.y);
-        }
-        
+        Vector2 origin = (hitOrigin ? (Vector2)hitOrigin.position : (Vector2)transform.position);
+        float dir = Mathf.Sign(transform.localScale.x);
+        Vector2 center = origin + new Vector2(atk1BoxOffset.x * dir, atk1BoxOffset.y);
         Gizmos.DrawWireCube(center, atk1BoxSize);
     }
 }
