@@ -105,7 +105,8 @@ public class DynamicCameraZoom : MonoBehaviour
         vcam.Lens.OrthographicSize = newSize;
     }
 
-    // Optional: Draw debug info
+#if UNITY_EDITOR
+    // Optional: Draw debug info in the Scene view
     private void OnDrawGizmosSelected()
     {
         if (playerRb != null)
@@ -121,4 +122,5 @@ public class DynamicCameraZoom : MonoBehaviour
             );
         }
     }
+#endif
 }
