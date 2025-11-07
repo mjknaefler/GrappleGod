@@ -1,0 +1,215 @@
+using System.Collections;
+using UnityEngine;
+
+public class Boss1 : MonoBehaviour
+{
+    [Header("Flight/Spacing")]
+    [SerializeField] float preferredRadius = 4.0f; // where it wants to hover
+    [SerializeField] float innerKeepOut    = 2.0f; // if closer than this, back off
+    [SerializeField] float outerLeash      = 9.0f; // if farther than this, move in
+    [SerializeField] float orbitSpeed      = 3.0f; // tangential speed around player
+    [SerializeField] float approachSpeed   = 5.0f;
+    [SerializeField] float retreatSpeed    = 7.0f;
+    [SerializeField] float maxSpeed        = 7.0f;
+    [SerializeField] float accel           = 20.0f;
+    [SerializeField] int   orbitDir        = 1;    // 1 = clockwise, -1 = counter
+
+
+    [Header("Refs")]
+    [SerializeField] Animator animator;                 // assign the boss animator
+    [SerializeField] Rigidbody2D rb;                    // optional but nice for simple movement
+    [SerializeField] Transform target;                  // auto-finds Player if left empty
+    [SerializeField] LayerMask playerLayer;
+    [SerializeField] Transform hitOrigin;               // empty child in front of boss
+    [SerializeField] Transform projectileSpawn;         // empty child where projectiles spawn
+    [SerializeField] GameObject projectilePrefab;       // optional (for Attack 2)
+
+    [Header("Animator State Names (must match Animator)")]
+    // Defaulted to your file/state names. If your Animator state names differ, set them in the Inspector.
+    [SerializeField] string idleState   = "Wooden Aarakocra Idle Animation";
+    [SerializeField] string atk1State   = "Wooden Aarakocra Attack 1Animation";
+    [SerializeField] string atk2State   = "Wooden Aarakocra Attack 2 Animation";
+
+    [Header("Behavior")]
+    [SerializeField] float chaseSpeed = 2.0f;
+    [SerializeField] float stopDistance = 1.25f;
+    [SerializeField] float stateCrossfade = 0.05f;
+
+    [Header("Attack 1 (Melee)")]
+    [SerializeField] float atk1Range = 1.6f;
+    [SerializeField] float atk1Damage = 12f;
+    [SerializeField] float atk1Cooldown = 2.5f;
+    [SerializeField] float atk1Telegraph = 0.25f;
+    [SerializeField] Vector2 atk1BoxSize = new Vector2(1.6f, 1.0f);
+    [SerializeField] Vector2 atk1BoxOffset = new Vector2(0.9f, 0.0f);
+
+    [Header("Attack 2 (Projectile or Melee Fallback)")]
+    [SerializeField] float atk2MinRange = 3.0f;
+    [SerializeField] float atk2MaxRange = 8.0f;
+    [SerializeField] float atk2Damage = 8f;
+    [SerializeField] float atk2Cooldown = 1.4f;
+    [SerializeField] float atk2Telegraph = 0.35f;
+    [SerializeField] float projectileSpeed = 9f;
+
+    float cd1, cd2;
+    bool busy;
+    int nextAttack = 1;
+
+    void Awake()
+    {
+        if (!animator) animator = GetComponentInChildren<Animator>();
+        if (!rb) rb = GetComponent<Rigidbody2D>();
+        if (!target)
+        {
+            var p = GameObject.FindGameObjectWithTag("Player");
+            if (p) target = p.transform;
+        }
+    }
+
+    void Update()
+    {
+        cd1 -= Time.deltaTime; 
+        cd2 -= Time.deltaTime;
+        if (!target) return;
+
+        // face player (flip sprite)
+        var s = transform.localScale;
+        s.x = Mathf.Abs(s.x) * (target.position.x >= transform.position.x ? 1 : -1);
+        transform.localScale = s;
+
+        if (busy) { if (rb) rb.linearVelocity = Vector2.zero; return; }
+
+        // ----- spacing/orbit config (tweak to taste) -----
+        const float preferredRadius = 4.0f; // desired hover distance
+        const float innerKeepOut    = 2.0f; // back off if inside this
+        const float outerLeash      = 9.0f; // move in if outside this
+        const float orbitSpeed      = 3.0f; // tangential speed around player
+        const float approachSpeed   = 5.0f; // speed when moving in
+        const float retreatSpeed    = 7.0f; // speed when backing off
+        const float maxSpeed        = 7.0f; // cap
+        const float accel           = 20.0f; // steering acceleration
+        const int   orbitDir        = 1;     // 1 = clockwise, -1 = counter
+
+        Vector2 toPlayer = (Vector2)(target.position - transform.position);
+        float   dist     = toPlayer.magnitude;
+
+        // choose attack based on range & cooldowns
+        if (nextAttack == 1 && dist <= atk1Range && cd1 <= 0f)
+        {
+            StartCoroutine(DoAttack1());
+            nextAttack = 2;   // next time, try attack 2
+        }
+        else if (nextAttack == 2 && dist >= atk2MinRange && dist <= atk2MaxRange && cd2 <= 0f)
+        {
+            StartCoroutine(DoAttack2());
+            nextAttack = 1;   // next time, try attack 1
+        }
+
+        // ----- flying hover/orbit movement (no gravity) -----
+        Vector2 desiredVel = Vector2.zero;
+
+        if (dist < innerKeepOut)
+        {
+            // too close -> back off
+            desiredVel = (-toPlayer).normalized * retreatSpeed;
+        }
+        else if (dist > outerLeash)
+        {
+            // too far -> move in
+            desiredVel = toPlayer.normalized * approachSpeed;
+        }
+        else
+        {
+            // within band -> orbit with gentle radial correction toward preferredRadius
+            Vector2 tangent = new Vector2(-toPlayer.y, toPlayer.x).normalized * orbitDir; // perpendicular to player vector
+            float radialErr = dist - preferredRadius;
+            Vector2 radial  = (-Mathf.Sign(radialErr) * toPlayer.normalized)
+                            * Mathf.Clamp01(Mathf.Abs(radialErr) / 2f) * 0.6f * maxSpeed;
+
+            desiredVel = tangent * orbitSpeed + radial;
+        }
+
+        // smooth steer toward desired velocity and clamp top speed
+        Vector2 v = Vector2.MoveTowards(rb ? rb.linearVelocity : Vector2.zero, desiredVel, accel * Time.deltaTime);
+        if (v.magnitude > maxSpeed) v = v.normalized * maxSpeed;
+        if (rb) rb.linearVelocity = v;
+
+        // idle anim if nearly stopped
+        if (animator && rb && rb.linearVelocity.sqrMagnitude < 0.01f)
+            CrossfadeSafe(idleState);
+    }
+
+
+    IEnumerator DoAttack1()
+    {
+        busy = true; if (rb) rb.linearVelocity = Vector2.zero;
+        CrossfadeSafe(atk1State);
+        yield return new WaitForSeconds(atk1Telegraph);
+        PerformAttack1();
+        cd1 = atk1Cooldown;
+        yield return new WaitForSeconds(0.15f);
+        busy = false;
+    }
+
+    IEnumerator DoAttack2()
+    {
+        busy = true; if (rb) rb.linearVelocity = Vector2.zero;
+        CrossfadeSafe(atk2State);
+        yield return new WaitForSeconds(atk2Telegraph);
+        PerformAttack2();
+        cd2 = atk2Cooldown;
+        yield return new WaitForSeconds(0.15f);
+        busy = false;
+    }
+
+    // Melee hit
+    public void PerformAttack1()
+    {
+        Vector2 origin = (hitOrigin ? (Vector2)hitOrigin.position : (Vector2)transform.position);
+        float dir = Mathf.Sign(transform.localScale.x);
+        Vector2 center = origin + new Vector2(atk1BoxOffset.x * dir, atk1BoxOffset.y);
+
+        Collider2D hit = Physics2D.OverlapBox(center, atk1BoxSize, 0f, playerLayer);
+        if (hit) hit.SendMessage("ApplyDamage", atk1Damage, SendMessageOptions.DontRequireReceiver);
+    }
+
+    // Projectile (if prefab set) else melee fallback using same box
+    public void PerformAttack2()
+    {
+        if (projectilePrefab && projectileSpawn)
+        {
+            GameObject proj = Instantiate(projectilePrefab, projectileSpawn.position, Quaternion.identity);
+            Vector2 dir = (target ? ((Vector2)(target.position - projectileSpawn.position)).normalized
+                                  : new Vector2(Mathf.Sign(transform.localScale.x), 0f));
+
+            if (proj.TryGetComponent<Rigidbody2D>(out var prb))
+                prb.linearVelocity = dir * projectileSpeed;
+
+            var dmg = proj.GetComponent<SimpleProjectileDamage>();
+            if (!dmg) dmg = proj.AddComponent<SimpleProjectileDamage>();
+            dmg.damage = atk2Damage;
+            dmg.playerLayer = playerLayer;
+        }
+        else
+        {
+            // fallback: reuse melee box
+            PerformAttack1();
+        }
+    }
+
+    void CrossfadeSafe(string stateName)
+    {
+        if (!animator || string.IsNullOrEmpty(stateName)) return;
+        animator.CrossFade(stateName, stateCrossfade, 0);
+    }
+
+    // editor visualization
+    void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Vector2 origin = (hitOrigin ? (Vector2)hitOrigin.position : (Vector2)transform.position);
+        float dir = Mathf.Sign(transform.localScale.x);
+        Vector2 center = origin + new Vector2(atk1BoxOffset.x * dir, atk1BoxOffset.y);
+        Gizmos.DrawWireCube(center, atk1BoxSize);
+    }
+}
