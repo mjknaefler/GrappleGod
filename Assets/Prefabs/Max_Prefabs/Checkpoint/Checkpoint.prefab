@@ -91,4 +91,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4c67d33051be999459dc739e971ce4f5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
-  makeCurrentOnStart: 0
+  makeCurrentOnStart: 1

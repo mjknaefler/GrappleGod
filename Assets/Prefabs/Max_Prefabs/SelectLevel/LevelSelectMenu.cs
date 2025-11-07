@@ -9,15 +9,15 @@ public class LevelSelectMenu : MonoBehaviour
     }
     public void Boss1()
     {
-        SceneManager.LoadSceneAsync(4);
+        SceneManager.LoadSceneAsync(3);
     }
     public void Level2()
     {
-        SceneManager.LoadSceneAsync(5);
+        SceneManager.LoadSceneAsync(4);
     }
     public void Boss2()
     {
-        SceneManager.LoadSceneAsync(6);
+        SceneManager.LoadSceneAsync(5);
     }
 
     public void BackButton()
