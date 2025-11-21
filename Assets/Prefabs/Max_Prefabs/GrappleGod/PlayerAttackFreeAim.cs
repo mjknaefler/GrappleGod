@@ -16,6 +16,9 @@ public class PlayerAttackFreeAim : MonoBehaviour
     private SpriteRenderer[] srs;
     private float baseScaleX = 1f;
 
+    // 🔊 NEW
+    private PlayerAudio playerAudio;
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -23,6 +26,10 @@ public class PlayerAttackFreeAim : MonoBehaviour
         if (visualRoot == null) visualRoot = transform;
         srs = visualRoot.GetComponentsInChildren<SpriteRenderer>(true);
         baseScaleX = Mathf.Abs(visualRoot.localScale.x);
+
+        // 🔊 FIND PlayerAudio (even if script is on a child)
+        playerAudio = GetComponentInParent<PlayerAudio>();
+
         if (firePoint == null)
         {
             var fp = new GameObject("FirePoint");
@@ -75,12 +82,19 @@ public class PlayerAttackFreeAim : MonoBehaviour
     public void OnAttack(InputValue value)
     {
         if (cooldownTimer > 0f) return;
+
         if (anim != null) anim.SetTrigger("Attack");
+
+        // 🔊 PLAY SHOOT SOUND
+        if (playerAudio != null)
+            playerAudio.PlayShoot();
+
         if (projectilePrefab != null && firePoint != null)
         {
             Quaternion rot = rotateProjectileToAim ? firePoint.rotation : Quaternion.identity;
             Instantiate(projectilePrefab, firePoint.position, rot);
         }
+
         cooldownTimer = attackCooldown;
     }
 }
