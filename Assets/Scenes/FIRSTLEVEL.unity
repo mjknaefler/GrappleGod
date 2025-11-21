@@ -474,6 +474,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1264395345044113937, guid: edb646abf300098439adfe6ab63044c8, type: 3}
+      propertyPath: m_Size.y
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1381945425987160483, guid: edb646abf300098439adfe6ab63044c8, type: 3}
       propertyPath: m_Size.y
       value: 2.67
@@ -579,6 +583,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1264395345044113937, guid: edb646abf300098439adfe6ab63044c8, type: 3}
+      propertyPath: m_Size.y
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1381945425987160483, guid: edb646abf300098439adfe6ab63044c8, type: 3}
       propertyPath: m_Size.y
       value: 2.67
@@ -657,6 +665,10 @@ PrefabInstance:
     - target: {fileID: 1099114173840249906, guid: edb646abf300098439adfe6ab63044c8, type: 3}
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1264395345044113937, guid: edb646abf300098439adfe6ab63044c8, type: 3}
+      propertyPath: m_Size.y
+      value: 0.7
       objectReference: {fileID: 0}
     - target: {fileID: 1381945425987160483, guid: edb646abf300098439adfe6ab63044c8, type: 3}
       propertyPath: m_Size.y
@@ -2456,7 +2468,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 5575132008068222478, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
   m_PrefabInstance: {fileID: 4317615564999237686}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1482018241}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 44d0563e19cb67509b0bcb2fa007af71, type: 3}
@@ -2467,7 +2479,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 4824041191718758601, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
   m_PrefabInstance: {fileID: 4317615564999237686}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1482018241}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5d5e7ec38fabb850c93193e6daff0f78, type: 3}
@@ -2478,7 +2490,7 @@ MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 3617696482183864655, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
   m_PrefabInstance: {fileID: 4317615564999237686}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 0}
+  m_GameObject: {fileID: 1482018241}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 5a7bb2b91e678c56893aeba762ac2033, type: 3}
@@ -2638,6 +2650,58 @@ Transform:
 Transform:
   m_CorrespondingSourceObject: {fileID: 1099114173840249906, guid: edb646abf300098439adfe6ab63044c8, type: 3}
   m_PrefabInstance: {fileID: 349568896}
+  m_PrefabAsset: {fileID: 0}
+--- !u!1 &1151617482 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 233228872897270020, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+  m_PrefabInstance: {fileID: 641005698475861185}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1151617484
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1151617482}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 2850b0f17f632cf5c89289e644ccf7c8, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Boss1_v2
+  aggroRadius: 12
+  hoverDistance: 4
+  moveSpeed: 5
+  orbitSpeed: 2
+  orbitDirection: 1
+  meleeRange: 2.5
+  diveBombMinRange: 2.5
+  diveBombMaxRange: 8
+  meleeDamage: 1
+  diveBombDamage: 1
+  attackCooldown: 5
+  telegraphTime: 0.5
+  diveBombSpeed: 15
+  diveBombRadius: 1.5
+  diveBombRecoveryTime: 1.5
+  meleeHitboxSize: {x: 2, y: 1.5}
+  meleeHitboxDistance: 1
+  target: {fileID: 871271254}
+  animator: {fileID: 1151617489}
+  rb: {fileID: 1151617488}
+  idleAnimation: Wooden Aarakocra Idle Animation
+  meleeAnimation: Wooden Aarakocra Attack 1Animation
+  diveBombAnimation: Wooden Aarakocra Attack 2 Animation
+  showDebugGizmos: 1
+  showDebugLogs: 1
+--- !u!50 &1151617488 stripped
+Rigidbody2D:
+  m_CorrespondingSourceObject: {fileID: 7133976553104982364, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+  m_PrefabInstance: {fileID: 641005698475861185}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1151617489 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 6812449636818997764, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+  m_PrefabInstance: {fileID: 641005698475861185}
   m_PrefabAsset: {fileID: 0}
 --- !u!4 &1156874654 stripped
 Transform:
@@ -3275,6 +3339,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 1264395345044113937, guid: edb646abf300098439adfe6ab63044c8, type: 3}
+      propertyPath: m_Size.y
+      value: 0.7
+      objectReference: {fileID: 0}
     - target: {fileID: 1381945425987160483, guid: edb646abf300098439adfe6ab63044c8, type: 3}
       propertyPath: m_Size.y
       value: 2.67
@@ -3469,6 +3537,24 @@ Transform:
   m_Children: []
   m_Father: {fileID: 2089529005}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &1482018241 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 969897952098128325, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
+  m_PrefabInstance: {fileID: 4317615564999237686}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1482018242
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1482018241}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ed8e638d4f5c14844bd9522482e9f76d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::DamageRelay
+  health: {fileID: 0}
 --- !u!1001 &1530794364
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -4605,6 +4691,10 @@ PrefabInstance:
       propertyPath: m_LocalPosition.y
       value: -4.78
       objectReference: {fileID: 0}
+    - target: {fileID: 950643253476605123, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+      propertyPath: maxHP
+      value: 25
+      objectReference: {fileID: 0}
     - target: {fileID: 1947183725216631836, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
       propertyPath: m_LocalPosition.x
       value: -4.87
@@ -4666,15 +4756,26 @@ PrefabInstance:
       value: -4.97
       objectReference: {fileID: 0}
     - target: {fileID: 9143631817260531879, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 1.0972083
+      objectReference: {fileID: 0}
+    - target: {fileID: 9143631817260531879, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 0.8526734
+      objectReference: {fileID: 0}
+    - target: {fileID: 9143631817260531879, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 105.84
+      value: 105.1269
       objectReference: {fileID: 0}
     - target: {fileID: 9143631817260531879, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 1.57
+      value: 2.0454
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
-    m_RemovedGameObjects: []
+    m_RemovedComponents:
+    - {fileID: 578713490251772838, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+    m_RemovedGameObjects:
+    - {fileID: 1389597634638170156, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+    - {fileID: 8986762909239798601, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 7190324064461326512, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
       insertIndex: 1
@@ -4721,7 +4822,10 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 7190324064461326512, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1609461970}
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 233228872897270020, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1151617484}
   m_SourcePrefab: {fileID: 100100000, guid: 234080b79169ee34ca7133ec7607fe29, type: 3}
 --- !u!1001 &1515387578164405859
 PrefabInstance:
@@ -5226,6 +5330,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 2224392747181074082, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
+      propertyPath: m_Distance
+      value: 5.35244
+      objectReference: {fileID: 0}
     - target: {fileID: 4824041191718758601, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
       propertyPath: targetManager
       value: 
@@ -5237,7 +5345,10 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 969897952098128325, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1482018242}
   m_SourcePrefab: {fileID: 100100000, guid: 6f9b572f75804114dbcfbf2d9d19c143, type: 3}
 --- !u!1001 &4398855637526219663
 PrefabInstance:
