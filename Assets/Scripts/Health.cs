@@ -25,7 +25,10 @@ public class Health : MonoBehaviour
 
     private Rigidbody2D rb;
     private Collider2D mainCollider; // Added to disable physics interaction
-    private SpriteRenderer sr;      // Added to hide the player
+    private SpriteRenderer sr;       // Added to hide the player
+
+    // 🔊 Optional audio for player / entities that have it
+    private PlayerAudio playerAudio;
 
     // Events
     public event Action<int, int> OnHealthChanged;
@@ -36,7 +39,10 @@ public class Health : MonoBehaviour
         rb = GetComponent<Rigidbody2D>();
         mainCollider = GetComponent<Collider2D>();
         sr = GetComponent<SpriteRenderer>(); // Get the renderer component
-        
+
+        // Try to get PlayerAudio (only exists on player or audio-enabled entities)
+        playerAudio = GetComponent<PlayerAudio>();
+
         // Subscribe the Die method to the OnDeath event
         OnDeath += Die; 
         
@@ -54,6 +60,12 @@ public class Health : MonoBehaviour
         if (amount < 0) return;
 
         Current -= amount;
+
+        // 🔊 Play hurt sound if this object has PlayerAudio
+        if (playerAudio != null)
+        {
+            playerAudio.PlayHurt();
+        }
         
         if (Current <= 0)
         {

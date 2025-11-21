@@ -42,6 +42,9 @@ public class PlayerAttackFreeAim : MonoBehaviour
     private bool isPlayingChargeAnimation = false;
     private bool isPlayingAttackAnimation = false;
 
+    // 🔊 NEW
+    private PlayerAudio playerAudio;
+
     private void Awake()
     {
         anim = GetComponent<Animator>();
@@ -55,6 +58,9 @@ public class PlayerAttackFreeAim : MonoBehaviour
         {
             playerFocus = GetComponent<PlayerFocus>();
         }
+
+        // 🔊 FIND PlayerAudio (even if script is on a child)
+        playerAudio = GetComponentInParent<PlayerAudio>();
         
         if (firePoint == null)
         {
@@ -264,6 +270,10 @@ public class PlayerAttackFreeAim : MonoBehaviour
             // Start coroutine to reset trigger and speed after animation
             StartCoroutine(ResetAttackTriggerAfterFrame());
         }
+        
+        // 🔊 PLAY SHOOT SOUND
+        if (playerAudio != null)
+            playerAudio.PlayShoot();
         
         if (projectilePrefab != null && firePoint != null)
         {
