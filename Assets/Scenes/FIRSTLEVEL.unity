@@ -5574,7 +5574,7 @@ PrefabInstance:
       objectReference: {fileID: 871271257}
     - target: {fileID: 9113901649860507841, guid: e9d8ec1c554d32b4fad6b9f15fe3c981, type: 3}
       propertyPath: hearts.Array.size
-      value: 11
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 9113901649860507841, guid: e9d8ec1c554d32b4fad6b9f15fe3c981, type: 3}
       propertyPath: 'hearts.Array.data[5]'
