@@ -332,6 +332,14 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 3819778182149293766, guid: f9031775784d67148b903f420990a27d, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 3819778182149293766, guid: f9031775784d67148b903f420990a27d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: 5314019549065222273, guid: 52e3ebd06d54b8e0bb401e35f7909f89, type: 3}
     - target: {fileID: 4651542063213685663, guid: f9031775784d67148b903f420990a27d, type: 3}
       propertyPath: m_OnClick.m_PersistentCalls.m_Calls.Array.size
       value: 1
@@ -368,6 +376,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: Canvas
       objectReference: {fileID: 0}
+    - target: {fileID: 7801922859290898496, guid: f9031775784d67148b903f420990a27d, type: 3}
+      propertyPath: m_Type
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 7801922859290898496, guid: f9031775784d67148b903f420990a27d, type: 3}
+      propertyPath: m_Sprite
+      value: 
+      objectReference: {fileID: -7774087291704191867, guid: 9dd51afe9a3b0d0068854fde861c8f4e, type: 3}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
