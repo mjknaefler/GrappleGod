@@ -5594,9 +5594,29 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5414183698133488576, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 0.71
+      objectReference: {fileID: 0}
+    - target: {fileID: 5414183698133488576, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: -12.89
+      objectReference: {fileID: 0}
     - target: {fileID: 6342262335525630313, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
       propertyPath: m_Name
       value: Hazards
+      objectReference: {fileID: 0}
+    - target: {fileID: 8542730014330574238, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
+      propertyPath: m_Size.y
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8542730014330574238, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
+      propertyPath: m_SpriteTilingProperty.newSize.y
+      value: 30
+      objectReference: {fileID: 0}
+    - target: {fileID: 8702457471528459514, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
+      propertyPath: m_Size.y
+      value: 30
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
