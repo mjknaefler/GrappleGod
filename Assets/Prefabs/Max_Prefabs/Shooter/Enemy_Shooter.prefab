@@ -189,7 +189,7 @@ MonoBehaviour:
   autoFindPlayer: 1
   bulletPrefab: {fileID: 1447881158757593050, guid: 5e94b129206cd2f4cb6bc00a67f9d661, type: 3}
   firePoint: {fileID: 4500729759893997456}
-  shootInterval: 2
+  shootInterval: 1
   bulletSpeed: 10
   detectionRange: 8
   weaponRenderer: {fileID: 5719217346380582060}

@@ -26,14 +26,33 @@ public class EnemyDeath : MonoBehaviour
             health.OnDeath -= HandleDeath;
         }
     }
-    
+
     void HandleDeath()
     {
-        // Detach platform before enemy is destroyed
         if (platform != null)
         {
-            platform.SetParent(null); // Remove from enemy's hierarchy
-            Debug.Log("Platform detached from enemy!");
+            platform.SetParent(null);
+
+            // FORCE the Ground layer (by index)
+            int groundLayer = LayerMask.NameToLayer("Ground");
+
+            if (groundLayer != -1)
+            {
+                platform.gameObject.layer = groundLayer;
+                Debug.Log($"Platform forced to Ground layer (index {groundLayer})");
+            }
+            else
+            {
+                Debug.LogError("Ground layer doesn't exist!");
+            }
+
+            // Also force collider settings
+            Collider2D col = platform.GetComponent<Collider2D>();
+            if (col != null)
+            {
+                col.enabled = true;
+                col.isTrigger = false;
+            }
         }
     }
 }

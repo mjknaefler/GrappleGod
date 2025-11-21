@@ -13,11 +13,11 @@ TagManager:
   - Water
   - UI
   - Player
+  - Bullet
   - Enemy
-  - Hitbox
-  - EnemyProjectile
+  - EnemyBullet
+  - Environment
   - Boundaries
-  - 
   - 
   - 
   - 

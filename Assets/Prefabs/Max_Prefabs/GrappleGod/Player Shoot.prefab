@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 4892534901291038290}
   - component: {fileID: 3304130090745753304}
   - component: {fileID: 7940466126828167924}
-  m_Layer: 0
+  m_Layer: 7
   m_Name: Player Shoot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -131,6 +131,7 @@ MonoBehaviour:
   speed: 20
   damage: 1
   lifeTime: 3
+  isCharged: 0
 --- !u!58 &3304130090745753304
 CircleCollider2D:
   m_ObjectHideFlags: 0
