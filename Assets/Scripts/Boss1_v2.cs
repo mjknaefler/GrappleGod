@@ -8,6 +8,7 @@ using UnityEngine;
 public class Boss1_v2 : MonoBehaviour
 {
     [Header("Movement")]
+    [SerializeField] float aggroRadius = 10.0f;         // Boss only activates when player this close
     [SerializeField] float hoverDistance = 4.0f;        // How far from player to hover
     [SerializeField] float moveSpeed = 5.0f;            // How fast boss moves
     [SerializeField] float orbitSpeed = 2.0f;           // How fast boss circles player
@@ -46,11 +47,12 @@ public class Boss1_v2 : MonoBehaviour
     [SerializeField] bool showDebugLogs = false;
     
     // State
-    enum BossState { Moving, Attacking, DiveBombing }
-    BossState currentState = BossState.Moving;
+    enum BossState { Idle, Moving, Attacking, DiveBombing }
+    BossState currentState = BossState.Idle;  // Start idle until player gets close
     float attackCooldownTimer = 0f;
     bool useDiveBomb = false;  // Alternates between melee and dive bomb
     Vector2 diveBombStartPosition;  // Where boss was before dive
+    bool isAggro = false;  // Has player entered aggro range?
     
     void Awake()
     {
@@ -87,7 +89,27 @@ public class Boss1_v2 : MonoBehaviour
     {
         if (!target) return;
         
-        // Always face the player
+        // Check if player is in aggro range
+        float distanceToPlayer = Vector2.Distance(transform.position, target.position);
+        
+        // Activate boss when player gets close
+        if (!isAggro && distanceToPlayer <= aggroRadius)
+        {
+            isAggro = true;
+            currentState = BossState.Moving;
+            if (showDebugLogs) Debug.Log($"<color=yellow>BOSS AGGRO! Player entered range at {distanceToPlayer:F2} units</color>");
+        }
+        
+        // Only do boss behavior if aggro'd
+        if (!isAggro)
+        {
+            // Boss is idle, just play idle animation
+            if (rb) rb.linearVelocity = Vector2.zero;
+            UpdateAnimation();
+            return;
+        }
+        
+        // Always face the player when aggro'd
         FaceTarget();
         
         // Update cooldown
@@ -97,6 +119,11 @@ public class Boss1_v2 : MonoBehaviour
         // State machine
         switch (currentState)
         {
+            case BossState.Idle:
+                // Should never be here if aggro'd, but just in case
+                if (rb) rb.linearVelocity = Vector2.zero;
+                break;
+                
             case BossState.Moving:
                 UpdateMovement();
                 TryStartAttack();
@@ -359,9 +386,9 @@ public class Boss1_v2 : MonoBehaviour
     {
         if (!animator) return;
         
-        // Animation is handled in attack coroutines now
-        // Just play idle when moving
-        if (currentState == BossState.Moving)
+        // Animation is handled in attack coroutines
+        // Play idle when not attacking
+        if (currentState == BossState.Idle || currentState == BossState.Moving)
         {
             if (!animator.GetCurrentAnimatorStateInfo(0).IsName(idleAnimation))
             {
@@ -373,6 +400,10 @@ public class Boss1_v2 : MonoBehaviour
     void OnDrawGizmosSelected()
     {
         if (!showDebugGizmos) return;
+        
+        // Draw AGGRO RADIUS around boss (most important!)
+        Gizmos.color = isAggro ? new Color(1, 0.5f, 0, 0.8f) : new Color(0.5f, 0.5f, 0.5f, 0.5f);
+        Gizmos.DrawWireSphere(transform.position, aggroRadius);
         
         // Draw hover distance circle
         Gizmos.color = Color.yellow;
