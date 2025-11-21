@@ -35,6 +35,9 @@ public class PlayerAttackFreeAim : MonoBehaviour
     private Camera mainCam;
     private SpriteRenderer[] srs;
     private float baseScaleX = 1f;
+
+    // 🔊 NEW
+    private PlayerAudio playerAudio;
     
     // Charge tracking
     private bool isHoldingAttack = false;
@@ -49,6 +52,10 @@ public class PlayerAttackFreeAim : MonoBehaviour
         if (visualRoot == null) visualRoot = transform;
         srs = visualRoot.GetComponentsInChildren<SpriteRenderer>(true);
         baseScaleX = Mathf.Abs(visualRoot.localScale.x);
+
+        // 🔊 FIND PlayerAudio (even if script is on a child)
+        playerAudio = GetComponentInParent<PlayerAudio>();
+
         
         // Auto-find PlayerFocus if not assigned
         if (playerFocus == null)
@@ -166,6 +173,14 @@ public class PlayerAttackFreeAim : MonoBehaviour
 
     public void OnAttack(InputValue value)
     {
+        if (cooldownTimer > 0f) return;
+
+        if (anim != null) anim.SetTrigger("Attack");
+
+        // 🔊 PLAY SHOOT SOUND
+        if (playerAudio != null)
+            playerAudio.PlayShoot();
+
         Debug.Log($"OnAttack called - isPressed: {value.isPressed}");
         
         // Handle button press
@@ -271,6 +286,7 @@ public class PlayerAttackFreeAim : MonoBehaviour
             Instantiate(projectilePrefab, firePoint.position, rot);
             Debug.Log("Spawned normal projectile");
         }
+
         
         cooldownTimer = attackCooldown;
     }
