@@ -88,6 +88,14 @@ PrefabInstance:
       propertyPath: m_Name
       value: OilWave (1)
       objectReference: {fileID: 0}
+    - target: {fileID: 3421920742334034861, guid: d82ca26417117ae40a2e486cf4ab3247, type: 3}
+      propertyPath: m_Size.x
+      value: 86.4
+      objectReference: {fileID: 0}
+    - target: {fileID: 3421920742334034861, guid: d82ca26417117ae40a2e486cf4ab3247, type: 3}
+      propertyPath: m_Size.y
+      value: 4.2
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
@@ -151,7 +159,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 0.16, y: 0.16}
-    newSize: {x: 20.59, y: 1.28}
+    newSize: {x: 86.4, y: 4.2}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
     adaptiveTiling: 0
@@ -197,7 +205,7 @@ BoxCollider2D:
     border: {x: 0, y: 0, z: 0, w: 0}
     pivot: {x: 0.5, y: 0.5}
     oldSize: {x: 0.16, y: 0.16}
-    newSize: {x: 20.59, y: 1.28}
+    newSize: {x: 86.4, y: 4.2}
     adaptiveTilingThreshold: 0.5
     drawMode: 2
     adaptiveTiling: 0
@@ -216,5 +224,5 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b06e605b0a2121e12888749a4ef2f8f1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::PlayerDamager
-  damageAmount: 5
-  damageCooldown: 1
+  damageAmount: 100
+  damageCooldown: 0
