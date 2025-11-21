@@ -2,14 +2,18 @@ using UnityEngine;
 
 public class Projectile : MonoBehaviour
 {
+    [Header("Projectile Stats")]
     [SerializeField] private float speed = 10f;
     [SerializeField] private int damage = 1;
     [SerializeField] private float lifeTime = 3f;
 
+    [Header("Charge Attack State")]
+    [Tooltip("Set this to true when spawning a charged projectile.")]
+    public bool isCharged = false; // Used to differentiate standard vs. piercing attack
+    
     private void Start()
     {
         // Destroy the projectile after 'lifeTime' seconds
-        // to prevent it from flying forever.
         Destroy(gameObject, lifeTime);
     }
 
@@ -19,21 +23,28 @@ public class Projectile : MonoBehaviour
         transform.Translate(Vector2.right * speed * Time.deltaTime);
     }
 
-    // This runs when the projectile's trigger hits another collider
+    // This runs when the projectile's trigger hits another collider (Defined ONLY ONCE)
     private void OnTriggerEnter2D(Collider2D other)
     {
-        // Check if the object we hit has a Health script
+        // 1. Try to get the Health component
         Health health = other.GetComponent<Health>();
         
-        // --- FIX WAS HERE ---
-        // 1. Added an opening brace {
-        // 2. Removed the stray '_f'
         if (health != null)
         {
-            // We hit an enemy (or player)! Deal damage.
+            // We hit an entity with Health!
             health.Damage(damage);
 
-            // Destroy the projectile on impact
+            // Standard Attack: Destroy on impact
+            if (!isCharged)
+            {
+                Destroy(gameObject);
+            }
+            // Charge Attack: Does NOT destroy on impact (it pierces)
+            // It will continue until its lifeTime expires or it hits an environment object.
+        }
+        else if (!isCharged && !other.CompareTag("Player"))
+        {
+            // Standard projectiles are destroyed by hitting walls/non-enemies
             Destroy(gameObject);
         }
     }
