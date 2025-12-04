@@ -283,7 +283,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 6517b674dcd0fdb4ab0e9a2737749359, type: 3}
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ChampagneLauncher
-  launchInterval: 2
+  launchInterval: 2.7
   warningDuration: 1
   launchVelocity: 5
   maxHeight: 7
