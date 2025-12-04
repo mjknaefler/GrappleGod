@@ -455,6 +455,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 3041310797712601926, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1068356617}
+    - targetCorrespondingSourceObject: {fileID: 3041310797712601926, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1146177385}
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: f522b30c9c6f2bc4cb88eafd68c911c1, type: 3}
 --- !u!4 &424097133 stripped
@@ -1275,6 +1278,11 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 7199621738205576282, guid: c8af544ea385245459ba78eb54c863c0, type: 3}
   m_PrefabInstance: {fileID: 1068356616}
   m_PrefabAsset: {fileID: 0}
+--- !u!4 &1146177385 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+  m_PrefabInstance: {fileID: 1042397678140650951}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1001 &1230889515
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2034,6 +2042,63 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 1030329222271459486, guid: 437dc365b5b49344e93ae9bb1ed4cbba, type: 3}
   m_PrefabInstance: {fileID: 1744474074}
   m_PrefabAsset: {fileID: 0}
+--- !u!1001 &1042397678140650951
+PrefabInstance:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Modification:
+    serializedVersion: 3
+    m_TransformParent: {fileID: 424097133}
+    m_Modifications:
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalPosition.x
+      value: 114.35
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalPosition.y
+      value: 15.719999
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalPosition.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalRotation.w
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalRotation.x
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalRotation.y
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalRotation.z
+      value: -0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.x
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.y
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1632943416939860925, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_LocalEulerAnglesHint.z
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 1937035359935511557, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
+      propertyPath: m_Name
+      value: TeslaCoilHazard
+      objectReference: {fileID: 0}
+    m_RemovedComponents: []
+    m_RemovedGameObjects: []
+    m_AddedGameObjects: []
+    m_AddedComponents: []
+  m_SourcePrefab: {fileID: 100100000, guid: 3961769f399d5a445aa5ab81e0b55ec2, type: 3}
 --- !u!1001 &4411796955375327715
 PrefabInstance:
   m_ObjectHideFlags: 0
