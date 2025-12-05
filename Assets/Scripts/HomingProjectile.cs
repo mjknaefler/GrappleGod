@@ -54,12 +54,12 @@ public class HomingProjectile : MonoBehaviour
                 float rotateAmount = Vector3.Cross(direction, transform.right).z;
                 rb.angularVelocity = -rotateAmount * rotateSpeed;
                 
-                Debug.Log($"[HOMING] Rotating towards {target.name}, angular velocity: {rb.angularVelocity}");
+             //   Debug.Log($"[HOMING] Rotating towards {target.name}, angular velocity: {rb.angularVelocity}");
             }
         }
         else
         {
-            Debug.Log($"[HOMING UPDATE] NOT ENABLED - homingEnabled: {homingEnabled}");
+           // Debug.Log($"[HOMING UPDATE] NOT ENABLED - homingEnabled: {homingEnabled}");
         }
 
         // Always move forward
@@ -69,7 +69,7 @@ public class HomingProjectile : MonoBehaviour
     public void EnableHoming()
     {
         homingEnabled = true;
-        Debug.Log($"Homing enabled on projectile! Enemy Layer: {enemyLayer.value}, Detection Radius: {detectionRadius}");
+     //   Debug.Log($"Homing enabled on projectile! Enemy Layer: {enemyLayer.value}, Detection Radius: {detectionRadius}");
     }
     
     public bool IsHomingActive()

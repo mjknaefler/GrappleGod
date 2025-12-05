@@ -131,6 +131,7 @@ MonoBehaviour:
   speed: 20
   damage: 1
   lifeTime: 3
+  owner: 1
   isCharged: 0
 --- !u!58 &3304130090745753304
 CircleCollider2D:
