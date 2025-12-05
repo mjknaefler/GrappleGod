@@ -122,9 +122,9 @@ public class PuffDaddyBoss : MonoBehaviour
         if (attackTimer > 0f)
             attackTimer -= Time.deltaTime;
         
-        // Floating animation
-        floatOffset += Time.deltaTime * floatSpeed;
-        float bobHeight = Mathf.Sin(floatOffset) * floatHeight * 0.3f;
+        // Floating animation (DISABLED - set to 0 to stop bobbing)
+        // floatOffset += Time.deltaTime * floatSpeed;
+        float bobHeight = 0f; // Was: Mathf.Sin(floatOffset) * floatHeight * 0.3f;
         
         // State machine
         switch (currentState)
@@ -153,9 +153,9 @@ public class PuffDaddyBoss : MonoBehaviour
 
     private void UpdateIdle()
     {
-        // Float in place
+        // Float in place (bobbing disabled)
         Vector3 targetPos = startPosition;
-        targetPos.y += Mathf.Sin(floatOffset) * floatHeight * 0.3f;
+        // targetPos.y += Mathf.Sin(floatOffset) * floatHeight * 0.3f;
         transform.position = Vector3.Lerp(transform.position, targetPos, Time.deltaTime * 2f);
         
         // Try to attack
