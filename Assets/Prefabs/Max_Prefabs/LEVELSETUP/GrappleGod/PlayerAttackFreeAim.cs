@@ -35,15 +35,15 @@ public class PlayerAttackFreeAim : MonoBehaviour
     private Camera mainCam;
     private SpriteRenderer[] srs;
     private float baseScaleX = 1f;
+
+    // 🔊 NEW
+    private PlayerAudio playerAudio;
     
     // Charge tracking
     private bool isHoldingAttack = false;
     private float holdTime = 0f;
     private bool isPlayingChargeAnimation = false;
     private bool isPlayingAttackAnimation = false;
-
-    // 🔊 NEW
-    private PlayerAudio playerAudio;
 
     private void Awake()
     {
@@ -52,15 +52,16 @@ public class PlayerAttackFreeAim : MonoBehaviour
         if (visualRoot == null) visualRoot = transform;
         srs = visualRoot.GetComponentsInChildren<SpriteRenderer>(true);
         baseScaleX = Mathf.Abs(visualRoot.localScale.x);
+
+        // 🔊 FIND PlayerAudio (even if script is on a child)
+        playerAudio = GetComponentInParent<PlayerAudio>();
+
         
         // Auto-find PlayerFocus if not assigned
         if (playerFocus == null)
         {
             playerFocus = GetComponent<PlayerFocus>();
         }
-
-        // 🔊 FIND PlayerAudio (even if script is on a child)
-        playerAudio = GetComponentInParent<PlayerAudio>();
         
         if (firePoint == null)
         {
@@ -172,6 +173,14 @@ public class PlayerAttackFreeAim : MonoBehaviour
 
     public void OnAttack(InputValue value)
     {
+        if (cooldownTimer > 0f) return;
+
+        if (anim != null) anim.SetTrigger("Attack");
+
+        // 🔊 PLAY SHOOT SOUND
+        if (playerAudio != null)
+            playerAudio.PlayShoot();
+
         Debug.Log($"OnAttack called - isPressed: {value.isPressed}");
         
         // Handle button press
@@ -271,16 +280,32 @@ public class PlayerAttackFreeAim : MonoBehaviour
             StartCoroutine(ResetAttackTriggerAfterFrame());
         }
         
-        // 🔊 PLAY SHOOT SOUND
-        if (playerAudio != null)
-            playerAudio.PlayShoot();
-        
         if (projectilePrefab != null && firePoint != null)
         {
             Quaternion rot = rotateProjectileToAim ? firePoint.rotation : Quaternion.identity;
-            Instantiate(projectilePrefab, firePoint.position, rot);
+            GameObject proj = Instantiate(projectilePrefab, firePoint.position, rot);
+            
+            // Enable homing if powerup is active
+            Debug.Log($"PlayerFocus null? {playerFocus == null}, HasHomingProjectiles? {(playerFocus != null ? playerFocus.HasHomingProjectiles.ToString() : "N/A")}");
+            
+            if (playerFocus != null && playerFocus.HasHomingProjectiles)
+            {
+                HomingProjectile homing = proj.GetComponent<HomingProjectile>();
+                Debug.Log($"HomingProjectile component found? {homing != null}");
+                if (homing != null)
+                {
+                    homing.EnableHoming();
+                    Debug.Log("Homing enabled on normal projectile!");
+                }
+                else
+                {
+                    Debug.LogWarning("Projectile prefab is missing HomingProjectile component!");
+                }
+            }
+            
             Debug.Log("Spawned normal projectile");
         }
+
         
         cooldownTimer = attackCooldown;
     }
@@ -358,6 +383,17 @@ public class PlayerAttackFreeAim : MonoBehaviour
             Quaternion rot = rotateProjectileToAim ? firePoint.rotation : Quaternion.identity;
             GameObject proj = Instantiate(secondaryProjectilePrefab, firePoint.position, rot);
             
+            // Enable homing if powerup is active
+            if (playerFocus != null && playerFocus.HasHomingProjectiles)
+            {
+                HomingProjectile homing = proj.GetComponent<HomingProjectile>();
+                if (homing != null)
+                {
+                    homing.EnableHoming();
+                    Debug.Log("Homing enabled on secondary projectile!");
+                }
+            }
+            
             // Make sure projectile has velocity (in case it uses Rigidbody2D)
             Rigidbody2D rb = proj.GetComponent<Rigidbody2D>();
             if (rb != null)
@@ -387,7 +423,19 @@ public class PlayerAttackFreeAim : MonoBehaviour
         {
             // Fallback to normal projectile if secondary not set
             Quaternion rot = rotateProjectileToAim ? firePoint.rotation : Quaternion.identity;
-            Instantiate(projectilePrefab, firePoint.position, rot);
+            GameObject proj = Instantiate(projectilePrefab, firePoint.position, rot);
+            
+            // Enable homing if powerup is active
+            if (playerFocus != null && playerFocus.HasHomingProjectiles)
+            {
+                HomingProjectile homing = proj.GetComponent<HomingProjectile>();
+                if (homing != null)
+                {
+                    homing.EnableHoming();
+                    Debug.Log("Homing enabled on fallback projectile!");
+                }
+            }
+            
             Debug.Log("Fired secondary attack (using normal projectile as fallback)");
         }
         

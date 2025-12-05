@@ -11,16 +11,31 @@ public class Projectile : MonoBehaviour
     [Tooltip("Set this to true when spawning a charged projectile.")]
     public bool isCharged = false; // Used to differentiate standard vs. piercing attack
     
+    private HomingProjectile homingProjectile;
+    
     private void Start()
     {
         // Destroy the projectile after 'lifeTime' seconds
         Destroy(gameObject, lifeTime);
+        
+        // Check if this projectile has homing capability
+        homingProjectile = GetComponent<HomingProjectile>();
     }
 
     private void Update()
     {
-        // Move the projectile forward (based on its rotation)
-        transform.Translate(Vector2.right * speed * Time.deltaTime);
+        // Only move with transform if homing is not active
+        // If homing is active, let HomingProjectile handle movement with Rigidbody2D
+        if (homingProjectile == null || !homingProjectile.IsHomingActive())
+        {
+            // Move the projectile forward (based on its rotation)
+            transform.Translate(Vector2.right * speed * Time.deltaTime);
+            Debug.Log($"[PROJECTILE] Using transform.Translate (homing: {(homingProjectile != null ? homingProjectile.IsHomingActive().ToString() : "no component")})");
+        }
+        else
+        {
+            Debug.Log($"[PROJECTILE] Homing is active, NOT using transform.Translate");
+        }
     }
 
     // This runs when the projectile's trigger hits another collider (Defined ONLY ONCE)
