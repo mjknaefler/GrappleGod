@@ -10,18 +10,21 @@ public class SuicideBomberEnemyTrigger : MonoBehaviour
     public int damageAmount = 1;
     public float destroyDelay = 0.7f;      // time to let Death anim play
     public string deathTriggerName = "Death";
+    public float armTime = 0.3f;           // delay before explosion can trigger
+    public float explodeRange = 1.5f;      // distance at which it auto-explodes
 
     private Transform player;
     private Animator animator;
     private Rigidbody2D rb;
     private bool isExploding = false;
+    private bool isArmed = false;
 
     private void Awake()
     {
         animator = GetComponentInChildren<Animator>();
         rb = GetComponent<Rigidbody2D>();
 
-        // Make sure our collider is trigger
+        // Make sure our collider is trigger (used for overlap, but not required for explosion anymore)
         Collider2D col = GetComponent<Collider2D>();
         col.isTrigger = true;
     }
@@ -31,6 +34,14 @@ public class SuicideBomberEnemyTrigger : MonoBehaviour
         GameObject playerObj = GameObject.FindGameObjectWithTag("Player");
         if (playerObj != null)
             player = playerObj.transform;
+
+        // Arm after a short delay so it doesn't instantly blow up on spawn
+        Invoke(nameof(Arm), armTime);
+    }
+
+    private void Arm()
+    {
+        isArmed = true;
     }
 
     private void Update()
@@ -44,20 +55,35 @@ public class SuicideBomberEnemyTrigger : MonoBehaviour
             rb.linearVelocity = dir * moveSpeed;
         else
             transform.position += (Vector3)dir * moveSpeed * Time.deltaTime;
+
+        // ---- NEW: explode when close enough ----
+        if (isArmed)
+        {
+            float distance = Vector2.Distance(transform.position, player.position);
+            if (distance <= explodeRange)
+            {
+                StartExplosion(player.gameObject);
+            }
+        }
     }
 
+    // OnTriggerEnter is now optional; you can even delete this if you want ONLY distance-based explosion
     private void OnTriggerEnter2D(Collider2D other)
     {
+        if (!isArmed) return;
         if (isExploding) return;
         if (!other.CompareTag("Player")) return;
 
-        // We touched the player -> explode
+        // If you *do* physically touch the player, also explode
         StartExplosion(other.gameObject);
     }
 
     private void StartExplosion(GameObject playerObj)
     {
+        if (isExploding) return;
         isExploding = true;
+
+        Debug.Log("StartExplosion CALLED on " + gameObject.name);
 
         if (rb != null)
             rb.linearVelocity = Vector2.zero;
@@ -73,5 +99,11 @@ public class SuicideBomberEnemyTrigger : MonoBehaviour
 
         // Destroy after a short delay
         Destroy(gameObject, destroyDelay);
+    }
+
+    private void OnDrawGizmosSelected()
+    {
+        Gizmos.color = Color.red;
+        Gizmos.DrawWireSphere(transform.position, explodeRange);
     }
 }
