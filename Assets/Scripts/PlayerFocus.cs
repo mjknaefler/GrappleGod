@@ -23,7 +23,7 @@ public class PlayerFocus : MonoBehaviour
     // Public read-only property for infinite focus state
     public bool HasInfiniteFocus { get; private set; }
     
-    // Public read-only property for homing projectiles state
+    // Public read-only property for homing projectiles state (permanent upgrade)
     public bool HasHomingProjectiles { get; private set; }
 
     // Event for HUD to subscribe to (Current Focus, Max Focus)
@@ -32,14 +32,11 @@ public class PlayerFocus : MonoBehaviour
     // Event for infinite focus state changes (active, duration remaining)
     public event Action<bool, float> OnInfiniteFocusChanged;
     
-    // Event for homing projectiles state changes (active, duration remaining)
-    public event Action<bool, float> OnHomingProjectilesChanged;
+    // Event for homing projectiles upgrade (fires once when unlocked)
+    public event Action OnHomingProjectilesUnlocked;
     
     // Infinite focus tracking
     private float infiniteFocusDuration = 0f;
-    
-    // Homing projectiles tracking
-    private float homingProjectilesDuration = 0f;
 
     private void Awake()
     {
@@ -84,20 +81,7 @@ public class PlayerFocus : MonoBehaviour
             }
         }
         
-        // Handle homing projectiles timer
-        if (HasHomingProjectiles)
-        {
-            homingProjectilesDuration -= Time.deltaTime;
-            OnHomingProjectilesChanged?.Invoke(true, homingProjectilesDuration);
-            
-            if (homingProjectilesDuration <= 0f)
-            {
-                // Homing projectiles expired
-                HasHomingProjectiles = false;
-                OnHomingProjectilesChanged?.Invoke(false, 0f);
-                Debug.Log("Homing Projectiles expired!");
-            }
-        }
+        // Homing is now permanent, no timer needed
     }
 
     /// <summary>
@@ -166,21 +150,20 @@ public class PlayerFocus : MonoBehaviour
     }
     
     /// <summary>
-    /// Activates homing projectiles mode for a specified duration.
+    /// Unlocks homing projectiles permanently (upgrade).
     /// </summary>
-    /// <param name="duration">How long homing projectiles lasts (in seconds)</param>
-    public void ActivateHomingProjectiles(float duration)
+    public void UnlockHomingProjectiles()
     {
-        HasHomingProjectiles = true;
-        homingProjectilesDuration = duration;
-        
-        OnHomingProjectilesChanged?.Invoke(true, duration);
-        
-        Debug.Log($"🎯 Homing Projectiles activated for {duration} seconds!");
+        if (!HasHomingProjectiles)
+        {
+            HasHomingProjectiles = true;
+            OnHomingProjectilesUnlocked?.Invoke();
+            
+            Debug.Log($"🎯 Homing Projectiles PERMANENTLY UNLOCKED!");
+        }
+        else
+        {
+            Debug.Log("Homing Projectiles already unlocked!");
+        }
     }
-    
-    /// <summary>
-    /// Gets the remaining time for homing projectiles powerup.
-    /// </summary>
-    public float GetHomingTimeRemaining() => HasHomingProjectiles ? homingProjectilesDuration : 0f;
 }

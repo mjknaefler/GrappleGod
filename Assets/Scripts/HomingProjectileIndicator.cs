@@ -7,13 +7,17 @@ public class HomingProjectileIndicator : MonoBehaviour
     [Header("References")]
     [SerializeField] private PlayerFocus playerFocus;
     [SerializeField] private Image iconImage;
-    [SerializeField] private TextMeshProUGUI timerText;
+    [SerializeField] private TextMeshProUGUI statusText;
     [SerializeField] private CanvasGroup canvasGroup;
 
     [Header("Visual Settings")]
-    [SerializeField] private Color activeColor = Color.cyan;
-    [SerializeField] private Color inactiveColor = Color.gray;
+    [SerializeField] private Color unlockedColor = Color.cyan;
+    [SerializeField] private Color lockedColor = Color.gray;
     [SerializeField] private float pulseSpeed = 2f;
+    [SerializeField] private float fadeInDuration = 0.5f;
+    
+    private bool isUnlocked = false;
+    private float fadeTimer = 0f;
 
     private void Awake()
     {
@@ -28,15 +32,25 @@ public class HomingProjectileIndicator : MonoBehaviour
         if (playerFocus == null)
             playerFocus = FindFirstObjectByType<PlayerFocus>();
 
-        // Subscribe to events
+        // Subscribe to unlock event
         if (playerFocus != null)
         {
-            playerFocus.OnHomingProjectilesChanged += OnHomingStatusChanged;
+            playerFocus.OnHomingProjectilesUnlocked += OnHomingUnlocked;
+            
+            // Check if already unlocked
+            isUnlocked = playerFocus.HasHomingProjectiles;
         }
 
-        // Start hidden
+        // Start hidden unless already unlocked
         if (canvasGroup != null)
-            canvasGroup.alpha = 0f;
+            canvasGroup.alpha = isUnlocked ? 1f : 0f;
+            
+        // Set initial colors
+        if (iconImage != null)
+            iconImage.color = isUnlocked ? unlockedColor : lockedColor;
+            
+        if (statusText != null)
+            statusText.text = isUnlocked ? "UNLOCKED" : "";
     }
 
     private void OnDestroy()
@@ -44,7 +58,7 @@ public class HomingProjectileIndicator : MonoBehaviour
         // Unsubscribe from events
         if (playerFocus != null)
         {
-            playerFocus.OnHomingProjectilesChanged -= OnHomingStatusChanged;
+            playerFocus.OnHomingProjectilesUnlocked -= OnHomingUnlocked;
         }
     }
 
@@ -52,43 +66,38 @@ public class HomingProjectileIndicator : MonoBehaviour
     {
         if (playerFocus == null) return;
 
-        if (playerFocus.HasHomingProjectiles)
+        if (isUnlocked)
         {
-            // Show the indicator
-            if (canvasGroup != null)
-                canvasGroup.alpha = 1f;
+            // Fade in animation when first unlocked
+            if (fadeTimer < fadeInDuration)
+            {
+                fadeTimer += Time.deltaTime;
+                if (canvasGroup != null)
+                    canvasGroup.alpha = Mathf.Lerp(0f, 1f, fadeTimer / fadeInDuration);
+            }
+            else
+            {
+                if (canvasGroup != null)
+                    canvasGroup.alpha = 1f;
+            }
 
-            // Pulse the icon
+            // Gentle pulse the icon to show it's active
             if (iconImage != null)
             {
                 float pulse = Mathf.PingPong(Time.time * pulseSpeed, 1f);
-                iconImage.color = Color.Lerp(inactiveColor, activeColor, pulse);
+                iconImage.color = Color.Lerp(unlockedColor * 0.8f, unlockedColor, pulse);
             }
-
-            // Update timer text
-            if (timerText != null)
-            {
-                float timeRemaining = playerFocus.GetHomingTimeRemaining();
-                timerText.text = Mathf.Ceil(timeRemaining).ToString("F0") + "s";
-            }
-        }
-        else
-        {
-            // Hide the indicator
-            if (canvasGroup != null)
-                canvasGroup.alpha = 0f;
         }
     }
 
-    private void OnHomingStatusChanged(bool isActive, float timeRemaining)
+    private void OnHomingUnlocked()
     {
-        if (isActive)
-        {
-            Debug.Log($"Homing Projectiles UI: Activated - {timeRemaining}s remaining");
-        }
-        else
-        {
-            Debug.Log("Homing Projectiles UI: Deactivated");
-        }
+        isUnlocked = true;
+        fadeTimer = 0f;
+        
+        if (statusText != null)
+            statusText.text = "UNLOCKED";
+            
+        Debug.Log("🎯 Homing Projectiles UI: Permanently Unlocked!");
     }
 }

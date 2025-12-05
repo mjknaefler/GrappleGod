@@ -3,10 +3,8 @@ using UnityEngine;
 public class HomingProjectilePowerup : MonoBehaviour
 {
     [Header("Powerup Settings")]
-    [SerializeField] private float duration = 15f;
-    [Tooltip("Should this powerup respawn after being collected?")]
-    [SerializeField] private bool respawns = true;
-    [SerializeField] private float respawnTime = 45f;
+    [Tooltip("This is a permanent upgrade - no respawn needed")]
+    [SerializeField] private bool permanentUpgrade = true;
 
     [Header("Visual Effects")]
     [SerializeField] private float rotationSpeed = 100f;
@@ -47,8 +45,8 @@ public class HomingProjectilePowerup : MonoBehaviour
             PlayerFocus playerFocus = other.GetComponent<PlayerFocus>();
             if (playerFocus != null)
             {
-                // Activate homing projectiles
-                playerFocus.ActivateHomingProjectiles(duration);
+                // Unlock homing projectiles permanently
+                playerFocus.UnlockHomingProjectiles();
 
                 // Play effects
                 if (collectEffect != null)
@@ -61,36 +59,11 @@ public class HomingProjectilePowerup : MonoBehaviour
                     AudioSource.PlayClipAtPoint(collectSound, transform.position);
                 }
 
-                Debug.Log($"Homing Projectiles activated for {duration} seconds!");
+                Debug.Log($"🎯 Homing Projectiles UPGRADE COLLECTED!");
 
-                // Handle respawn or destruction
-                if (respawns)
-                {
-                    StartCoroutine(RespawnCoroutine());
-                }
-                else
-                {
-                    Destroy(gameObject);
-                }
+                // Destroy the powerup (it's a permanent upgrade, no respawn)
+                Destroy(gameObject);
             }
         }
-    }
-
-    private System.Collections.IEnumerator RespawnCoroutine()
-    {
-        // Hide the powerup
-        spriteRenderer.enabled = false;
-        col.enabled = false;
-
-        // Wait for respawn time
-        yield return new WaitForSeconds(respawnTime);
-
-        // Show the powerup again
-        spriteRenderer.enabled = true;
-        col.enabled = true;
-        transform.position = startPosition;
-        bobTimer = 0f;
-
-        Debug.Log("Homing Projectile powerup respawned!");
     }
 }
