@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 3304130090745753304}
   - component: {fileID: 7940466126828167924}
   - component: {fileID: -8844775989783555020}
+  - component: {fileID: 2308106102874189565}
   m_Layer: 0
   m_Name: Player Shoot Homing
   m_TagString: Untagged
@@ -192,9 +193,27 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::HomingProjectile
   speed: 15
-  rotateSpeed: 200
-  detectionRadius: 10
+  rotateSpeed: 400
+  detectionRadius: 50
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 128
+    m_Bits: 256
   lifeTime: 4
+--- !u!114 &2308106102874189565
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7259374370334305698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 29e9e3c1e792eabddbc5b3d1c53166fa, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::Projectile
+  speed: 10
+  damage: 1
+  lifeTime: 3
+  owner: 0
+  isCharged: 0
+  usePhysicsOnly: 0
