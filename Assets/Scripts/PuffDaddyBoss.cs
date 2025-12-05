@@ -20,7 +20,8 @@ public class PuffDaddyBoss : MonoBehaviour
     
     [Header("Attack Settings - Phase 2")]
     [SerializeField] private float phase2AttackCooldown = 1.5f;
-    [SerializeField] private GameObject moneyRainPrefab;
+    [Tooltip("Oil droplet prefab for Oil Rain attack")]
+    [SerializeField] private GameObject moneyRainPrefab; // Still named moneyRainPrefab for backwards compatibility
     [SerializeField] private GameObject soundwaveProjectile;
     [SerializeField] private int phase2ProjectileCount = 8; // More aggressive
     
@@ -33,6 +34,7 @@ public class PuffDaddyBoss : MonoBehaviour
     [SerializeField] private float aggroRadius = 15f;
     [SerializeField] private Transform arenaCenter;
     [SerializeField] private float arenaRadius = 10f;
+    [SerializeField] private RisingOilLevel risingOil; // Reference to rising oil system
     
     [Header("Audio")]
     [SerializeField] private AudioClip phase1Music;
@@ -259,35 +261,37 @@ public class PuffDaddyBoss : MonoBehaviour
         currentState = BossState.Attacking;
         attackTimer = attackCooldown;
         
-        Debug.Log("🎵 PUFF DADDY: Musical Note Barrage!");
+        Debug.Log("🎵 PUFF DADDY: BIG Musical Note!");
         PlaySound(attackSound);
         
         if (anim != null)
             anim.SetTrigger("Attack1");
         
-        yield return new WaitForSeconds(0.3f); // Wind-up
+        yield return new WaitForSeconds(0.5f); // Longer wind-up for big attack
         
         if (player != null && musicalNoteProjectile != null)
         {
-            int noteCount = currentPhase == BossPhase.Phase2 ? 5 : 3;
-            float spreadAngle = 30f;
+            // Shoot ONE BIG projectile
+            Vector2 direction = (player.position - transform.position).normalized;
+            float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
             
-            for (int i = 0; i < noteCount; i++)
+            GameObject bigNote = Instantiate(musicalNoteProjectile, transform.position, Quaternion.Euler(0, 0, angle));
+            
+            // Make it BIG and POWERFUL
+            bigNote.transform.localScale = Vector3.one * (currentPhase == BossPhase.Phase2 ? 3f : 2f);
+            
+            Rigidbody2D noteRb = bigNote.GetComponent<Rigidbody2D>();
+            if (noteRb != null)
             {
-                Vector2 direction = (player.position - transform.position).normalized;
-                float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
-                angle += (i - noteCount / 2) * spreadAngle;
-                
-                GameObject note = Instantiate(musicalNoteProjectile, transform.position, Quaternion.Euler(0, 0, angle));
-                
-                Rigidbody2D noteRb = note.GetComponent<Rigidbody2D>();
-                if (noteRb != null)
-                {
-                    Vector2 fireDirection = Quaternion.Euler(0, 0, angle) * Vector2.right;
-                    noteRb.linearVelocity = fireDirection * 10f;
-                }
-                
-                yield return new WaitForSeconds(0.1f);
+                float speed = currentPhase == BossPhase.Phase2 ? 12f : 8f;
+                noteRb.linearVelocity = direction * speed;
+            }
+            
+            // Increase damage if projectile has Projectile component
+            Projectile proj = bigNote.GetComponent<Projectile>();
+            if (proj != null)
+            {
+                proj.SetDamage(currentPhase == BossPhase.Phase2 ? 3 : 2);
             }
         }
         
@@ -300,7 +304,7 @@ public class PuffDaddyBoss : MonoBehaviour
         currentState = BossState.Attacking;
         attackTimer = attackCooldown;
         
-        Debug.Log("🍾 PUFF DADDY: Champagne Bottle Throw!");
+        Debug.Log("🍾 PUFF DADDY: Champagne Bottle Spray!");
         PlaySound(attackSound);
         
         if (anim != null)
@@ -308,17 +312,54 @@ public class PuffDaddyBoss : MonoBehaviour
         
         yield return new WaitForSeconds(0.4f); // Wind-up
         
-        if (player != null && champagneBottlePrefab != null)
+        if (champagneBottlePrefab != null)
         {
-            // Lob bottle at player with arc
-            Vector2 direction = (player.position - transform.position).normalized;
-            GameObject bottle = Instantiate(champagneBottlePrefab, transform.position + Vector3.up, Quaternion.identity);
+            // Throw bottles in random directions all around with WIDE SPREAD!
+            int bottleCount = currentPhase == BossPhase.Phase2 ? 12 : 8;
             
-            Rigidbody2D bottleRb = bottle.GetComponent<Rigidbody2D>();
-            if (bottleRb != null)
+            for (int i = 0; i < bottleCount; i++)
             {
-                bottleRb.gravityScale = 1f;
-                bottleRb.linearVelocity = direction * 8f + Vector2.up * 5f; // Arc trajectory
+                // Random angle for chaotic spread
+                float angle = Random.Range(0f, 360f);
+                Vector2 direction = new Vector2(
+                    Mathf.Cos(angle * Mathf.Deg2Rad),
+                    Mathf.Sin(angle * Mathf.Deg2Rad)
+                );
+                
+                // Larger random spawn offset for wider starting spread
+                Vector2 spawnOffset = Random.insideUnitCircle * 1.5f;
+                Vector3 spawnPos = transform.position + new Vector3(spawnOffset.x, spawnOffset.y + 1f, 0);
+                
+                GameObject bottle = Instantiate(champagneBottlePrefab, spawnPos, Quaternion.Euler(0, 0, angle));
+                
+                // Disable Projectile's transform movement
+                Projectile proj = bottle.GetComponent<Projectile>();
+                if (proj != null)
+                {
+                    proj.usePhysicsOnly = true;
+                }
+                
+                Rigidbody2D bottleRb = bottle.GetComponent<Rigidbody2D>();
+                if (bottleRb != null)
+                {
+                    // Force dynamic body type
+                    bottleRb.bodyType = RigidbodyType2D.Dynamic;
+                    bottleRb.gravityScale = 0.6f; // Same gravity for all
+                    
+                    // Same speed and upward force for consistent spread
+                    float speed = 8f;
+                    float upwardForce = 8f;
+                    
+                    Vector2 velocity = direction * speed + Vector2.up * upwardForce;
+                    
+                    // Set velocity
+                    bottleRb.linearVelocity = velocity;
+                    
+                    // Add random spin for variety
+                    bottleRb.angularVelocity = Random.Range(-300f, 300f);
+                }
+                
+                yield return new WaitForSeconds(0.08f); // Quick succession
             }
         }
         
@@ -369,29 +410,64 @@ public class PuffDaddyBoss : MonoBehaviour
         currentState = BossState.Attacking;
         attackTimer = phase2AttackCooldown;
         
-        Debug.Log("💰 PUFF DADDY: IT'S ALL ABOUT THE BENJAMINS!");
+        Debug.Log("�️ PUFF DADDY: OIL RAIN!");
         PlaySound(laughSound);
         
         if (anim != null)
             anim.SetTrigger("Attack3");
         
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.3f);
         
-        // Rain money projectiles from above
+        // Rain oil droplets from above in a wide spread
         if (moneyRainPrefab != null && player != null)
         {
-            for (int i = 0; i < 10; i++)
+            int dropletCount = 20; // More droplets for oil rain effect
+            float rainWidth = 10f; // Wide area
+            float rainHeight = 10f; // Height above player
+            
+            for (int i = 0; i < dropletCount; i++)
             {
-                Vector3 spawnPos = player.position + new Vector3(Random.Range(-5f, 5f), 8f, 0f);
-                GameObject money = Instantiate(moneyRainPrefab, spawnPos, Quaternion.identity);
+                // Spawn droplets in a wide area above the player
+                Vector3 spawnPos = player.position + new Vector3(
+                    Random.Range(-rainWidth, rainWidth), 
+                    rainHeight + Random.Range(0f, 2f), // Slight height variation
+                    0f
+                );
                 
-                Rigidbody2D moneyRb = money.GetComponent<Rigidbody2D>();
-                if (moneyRb != null)
+                GameObject oil = Instantiate(moneyRainPrefab, spawnPos, Quaternion.identity);
+                
+                // Make oil droplets smaller
+                oil.transform.localScale = Vector3.one * Random.Range(0.3f, 0.6f);
+                
+                // Disable Projectile's transform movement for physics-based falling
+                Projectile proj = oil.GetComponent<Projectile>();
+                if (proj != null)
                 {
-                    moneyRb.gravityScale = 1f;
+                    proj.usePhysicsOnly = true;
+                    Debug.Log($"🛢️ Oil droplet spawned at {spawnPos}, usePhysicsOnly={proj.usePhysicsOnly}");
+                }
+                else
+                {
+                    Debug.LogWarning("🛢️ Oil prefab is missing Projectile component!");
                 }
                 
-                yield return new WaitForSeconds(0.15f);
+                Rigidbody2D oilRb = oil.GetComponent<Rigidbody2D>();
+                if (oilRb != null)
+                {
+                    oilRb.bodyType = RigidbodyType2D.Dynamic;
+                    oilRb.gravityScale = Random.Range(1.5f, 2.5f); // Varied fall speeds
+                    
+                    // Slight horizontal drift
+                    oilRb.linearVelocity = new Vector2(Random.Range(-1f, 1f), 0f);
+                    
+                    Debug.Log($"🛢️ Oil RB2D velocity set to: {oilRb.linearVelocity}, gravity: {oilRb.gravityScale}");
+                }
+                else
+                {
+                    Debug.LogWarning("🛢️ Oil prefab is missing Rigidbody2D component!");
+                }
+                
+                yield return new WaitForSeconds(0.08f); // Quick succession
             }
         }
         
@@ -514,6 +590,13 @@ public class PuffDaddyBoss : MonoBehaviour
         isInvulnerable = false;
         attackCooldown = phase2AttackCooldown;
         moveSpeed *= 1.3f; // Faster movement
+        
+        // Make oil rise faster in Phase 2!
+        if (risingOil != null)
+        {
+            risingOil.IncreaseRiseSpeed(2f); // 2x faster rise speed
+            Debug.Log("🛢️ The oil rises faster! Get to higher ground!");
+        }
         
         Debug.Log("🔥 PHASE 2 ACTIVATED! Boss is now more aggressive!");
         

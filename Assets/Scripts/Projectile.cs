@@ -15,9 +15,14 @@ public class Projectile : MonoBehaviour
     [Tooltip("Set this to true when spawning a charged projectile.")]
     public bool isCharged = false; // Used to differentiate standard vs. piercing attack
     
+    [Header("Physics-Based Movement")]
+    [Tooltip("If true, uses Rigidbody2D only (disables transform movement)")]
+    public bool usePhysicsOnly = false; // For physics-based projectiles like bottles/oil
+    
     public enum ProjectileOwner { Player, Enemy }
     
     private HomingProjectile homingProjectile;
+    private bool canCollide = true;
     
     private void Start()
     {
@@ -26,27 +31,50 @@ public class Projectile : MonoBehaviour
         
         // Check if this projectile has homing capability
         homingProjectile = GetComponent<HomingProjectile>();
+        
+        // For physics projectiles, delay collision to avoid instant wall hits
+        if (usePhysicsOnly)
+        {
+            canCollide = false;
+            Invoke(nameof(EnableCollision), 0.2f);
+        }
+    }
+    
+    private void EnableCollision()
+    {
+        canCollide = true;
     }
 
     private void Update()
     {
-        // Only move with transform if homing is not active
-        // If homing is active, let HomingProjectile handle movement with Rigidbody2D
-        if (homingProjectile == null || !homingProjectile.IsHomingActive())
+        // Skip transform movement if using physics only
+        if (usePhysicsOnly) return;
+        
+        // Only move with transform if:
+        // 1. Homing is not active
+        // 2. Speed is greater than 0 (allows physics-based projectiles to disable this)
+        // 3. Rigidbody2D doesn't have manual velocity set
+        if ((homingProjectile == null || !homingProjectile.IsHomingActive()) && speed > 0)
         {
+            // Check if Rigidbody2D has been manually set (like champagne bottles)
+            Rigidbody2D rb = GetComponent<Rigidbody2D>();
+            if (rb != null && rb.linearVelocity.magnitude > 0.1f)
+            {
+                // Rigidbody2D is handling movement, don't use transform
+                return;
+            }
+            
             // Move the projectile forward (based on its rotation)
             transform.Translate(Vector2.right * speed * Time.deltaTime);
-           // Debug.Log($"[PROJECTILE] Using transform.Translate (homing: {(homingProjectile != null ? homingProjectile.IsHomingActive().ToString() : "no component")})");
-        }
-        else
-        {
-            // Debug.Log($"[PROJECTILE] Homing is active, NOT using transform.Translate");
         }
     }
 
     // This runs when the projectile's trigger hits another collider (Defined ONLY ONCE)
     private void OnTriggerEnter2D(Collider2D other)
     {
+        // Skip collision if not ready yet (for physics projectiles)
+        if (!canCollide) return;
+        
         // PLAYER PROJECTILES: Don't hit the player, only hit enemies
         if (owner == ProjectileOwner.Player)
         {
@@ -103,5 +131,11 @@ public class Projectile : MonoBehaviour
             // Standard projectiles are destroyed by hitting walls/non-enemies
             Destroy(gameObject);
         }
+    }
+    
+    // Public method to modify damage (used by boss to make bigger projectiles do more damage)
+    public void SetDamage(int newDamage)
+    {
+        damage = newDamage;
     }
 }
