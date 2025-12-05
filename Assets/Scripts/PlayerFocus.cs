@@ -22,6 +22,9 @@ public class PlayerFocus : MonoBehaviour
     
     // Public read-only property for infinite focus state
     public bool HasInfiniteFocus { get; private set; }
+    
+    // Public read-only property for homing projectiles state
+    public bool HasHomingProjectiles { get; private set; }
 
     // Event for HUD to subscribe to (Current Focus, Max Focus)
     public event Action<float, float> OnFocusChanged;
@@ -29,8 +32,14 @@ public class PlayerFocus : MonoBehaviour
     // Event for infinite focus state changes (active, duration remaining)
     public event Action<bool, float> OnInfiniteFocusChanged;
     
+    // Event for homing projectiles state changes (active, duration remaining)
+    public event Action<bool, float> OnHomingProjectilesChanged;
+    
     // Infinite focus tracking
     private float infiniteFocusDuration = 0f;
+    
+    // Homing projectiles tracking
+    private float homingProjectilesDuration = 0f;
 
     private void Awake()
     {
@@ -72,6 +81,21 @@ public class PlayerFocus : MonoBehaviour
                 CurrentFocus += chargeRate * 0.05f * Time.deltaTime;
                 CurrentFocus = Mathf.Clamp(CurrentFocus, 0f, maxFocus);
                 OnFocusChanged?.Invoke(CurrentFocus, maxFocus);
+            }
+        }
+        
+        // Handle homing projectiles timer
+        if (HasHomingProjectiles)
+        {
+            homingProjectilesDuration -= Time.deltaTime;
+            OnHomingProjectilesChanged?.Invoke(true, homingProjectilesDuration);
+            
+            if (homingProjectilesDuration <= 0f)
+            {
+                // Homing projectiles expired
+                HasHomingProjectiles = false;
+                OnHomingProjectilesChanged?.Invoke(false, 0f);
+                Debug.Log("Homing Projectiles expired!");
             }
         }
     }
@@ -140,4 +164,23 @@ public class PlayerFocus : MonoBehaviour
         CurrentFocus = Mathf.Clamp(CurrentFocus, 0f, maxFocus);
         OnFocusChanged?.Invoke(CurrentFocus, maxFocus);
     }
+    
+    /// <summary>
+    /// Activates homing projectiles mode for a specified duration.
+    /// </summary>
+    /// <param name="duration">How long homing projectiles lasts (in seconds)</param>
+    public void ActivateHomingProjectiles(float duration)
+    {
+        HasHomingProjectiles = true;
+        homingProjectilesDuration = duration;
+        
+        OnHomingProjectilesChanged?.Invoke(true, duration);
+        
+        Debug.Log($"🎯 Homing Projectiles activated for {duration} seconds!");
+    }
+    
+    /// <summary>
+    /// Gets the remaining time for homing projectiles powerup.
+    /// </summary>
+    public float GetHomingTimeRemaining() => HasHomingProjectiles ? homingProjectilesDuration : 0f;
 }
