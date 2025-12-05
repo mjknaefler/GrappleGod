@@ -286,13 +286,20 @@ public class PlayerAttackFreeAim : MonoBehaviour
             GameObject proj = Instantiate(projectilePrefab, firePoint.position, rot);
             
             // Enable homing if powerup is active
+            Debug.Log($"PlayerFocus null? {playerFocus == null}, HasHomingProjectiles? {(playerFocus != null ? playerFocus.HasHomingProjectiles.ToString() : "N/A")}");
+            
             if (playerFocus != null && playerFocus.HasHomingProjectiles)
             {
                 HomingProjectile homing = proj.GetComponent<HomingProjectile>();
+                Debug.Log($"HomingProjectile component found? {homing != null}");
                 if (homing != null)
                 {
                     homing.EnableHoming();
                     Debug.Log("Homing enabled on normal projectile!");
+                }
+                else
+                {
+                    Debug.LogWarning("Projectile prefab is missing HomingProjectile component!");
                 }
             }
             

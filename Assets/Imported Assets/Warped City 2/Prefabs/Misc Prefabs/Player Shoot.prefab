@@ -14,6 +14,7 @@ GameObject:
   - component: {fileID: 4892534901291038290}
   - component: {fileID: 3304130090745753304}
   - component: {fileID: 7940466126828167924}
+  - component: {fileID: -1937208297016976994}
   m_Layer: 0
   m_Name: Player Shoot
   m_TagString: Untagged
@@ -131,6 +132,7 @@ MonoBehaviour:
   speed: 20
   damage: 1
   lifeTime: 3
+  isCharged: 0
 --- !u!58 &3304130090745753304
 CircleCollider2D:
   m_ObjectHideFlags: 0
@@ -194,3 +196,22 @@ Rigidbody2D:
   m_SleepingMode: 1
   m_CollisionDetection: 0
   m_Constraints: 0
+--- !u!114 &-1937208297016976994
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7259374370334305698}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 5459ead01b1d7c9fa9f46cd7716fe99e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Assembly-CSharp::HomingProjectile
+  speed: 15
+  rotateSpeed: 200
+  detectionRadius: 100
+  enemyLayer:
+    serializedVersion: 2
+    m_Bits: 128
+  lifeTime: 4
